@@ -35,17 +35,23 @@
 
 //-------------------------------------------------------------------------
 
+#ifndef _MSC_VER
 Datum shortest_path_shooting_star(PG_FUNCTION_ARGS);
+#else // _MSC_VER
+PGDLLEXPORT Datum shortest_path_shooting_star(PG_FUNCTION_ARGS);
+#endif // _MSC_VER
 
 #undef DEBUG
 //#define DEBUG 1
 
+#ifndef _MSC_VER
 #ifdef DEBUG
 #define DBG(format, arg...)                     \
     elog(NOTICE, format , ## arg)
 #else
 #define DBG(format, arg...) do { ; } while (0)
 #endif
+#endif // _MSC_VER
 
 // The number of tuples to fetch from the SPI cursor at each iteration
 #define TUPLIMIT 1000
@@ -188,6 +194,7 @@ fetch_edge_shooting_star(HeapTuple *tuple, TupleDesc *tupdesc,
   Datum binval;
   bool isnull;
   int t;
+  char *str;
 
   for(t=0; t<MAX_RULE_LENGTH;++t)
     target_edge->rule[t] = -1;
@@ -248,7 +255,7 @@ fetch_edge_shooting_star(HeapTuple *tuple, TupleDesc *tupdesc,
   else
     target_edge->to_cost = DatumGetFloat8(binval);
 
-  char *str = DatumGetCString(SPI_getvalue(*tuple, *tupdesc, edge_columns->rule));
+  str = DatumGetCString(SPI_getvalue(*tuple, *tupdesc, edge_columns->rule));
 
   if(str!=NULL)
   {
@@ -286,10 +293,14 @@ static int compute_shortest_path_shooting_star(char* sql, int source_edge_id,
   int e_max_id=0;
   int e_min_id=INT_MAX;  
     
+#ifndef _MSC_VER
   edge_shooting_star_columns_t edge_columns = {id: -1, source: -1, target: -1, 
 				       cost: -1, reverse_cost: -1, 
 				       s_x: -1, s_y: -1, t_x: -1, t_y: -1,
 				       to_cost: -1, rule: -1};
+#else // _MSC_VER
+  edge_shooting_star_columns_t edge_columns = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+#endif // _MSC_VER
   char *err_msg;
   int ret = -1;
   register int z, t;
@@ -445,7 +456,11 @@ static int compute_shortest_path_shooting_star(char* sql, int source_edge_id,
 
 
 PG_FUNCTION_INFO_V1(shortest_path_shooting_star);
+#ifndef _MSC_VER
 Datum
+#else // _MSC_VER
+PGDLLEXPORT Datum
+#endif // _MSC_VER
 shortest_path_shooting_star(PG_FUNCTION_ARGS)
 {
   FuncCallContext     *funcctx;

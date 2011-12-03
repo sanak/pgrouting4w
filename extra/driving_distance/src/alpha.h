@@ -19,8 +19,12 @@
  *
  */
  
+#ifndef _ALPHA_H
 #define _ALPHA_H
 
+#ifdef _MSC_VER
+#define ELOG_H
+#endif // _MSC_VER
 #include "postgres.h"
 #include "dijkstra.h"
 
@@ -38,9 +42,11 @@ extern "C"
                                                                      
   int alpha_shape(vertex_t *vertices, unsigned int count, 
                   vertex_t **res, int *res_count, char **err_msg);
-
+#ifdef _MSC_VER
+  void DBG(const char* format, ...);
+#endif // _MSC_VER
 #ifdef __cplusplus
 }
 #endif
-
+#endif // _ALPHA_H
                                         

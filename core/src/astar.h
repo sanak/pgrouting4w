@@ -19,6 +19,7 @@
  *
  */
  
+#ifndef _ASTAR_H
 #define _ASTAR_H
 
 #include "postgres.h"
@@ -48,3 +49,4 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+#endif // _ASTAR_H

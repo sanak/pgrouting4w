@@ -28,17 +28,35 @@
 
 #include "dijkstra.h"
 
+#ifndef _MSC_VER
 Datum shortest_path(PG_FUNCTION_ARGS);
+#else // _MSC_VER
+PGDLLEXPORT Datum shortest_path(PG_FUNCTION_ARGS);
+#endif // _MSC_VER
 
 #undef DEBUG
 //#define DEBUG 1
 
+#ifndef _MSC_VER
 #ifdef DEBUG
 #define DBG(format, arg...)                     \
     elog(NOTICE, format , ## arg)
 #else
 #define DBG(format, arg...) do { ; } while (0)
 #endif
+#else // _MSC_VER
+extern void DBG(const char *format, ...)
+{
+#if DEBUG
+	va_list ap;
+	char msg[256];
+	va_start(ap, format);
+	_vsprintf_p(msg, 256, format, ap);
+	va_end(ap);
+	elog(NOTICE, msg);
+#endif
+}
+#endif // _MSC_VER
 
 // The number of tuples to fetch from the SPI cursor at each iteration
 #define TUPLIMIT 1000
@@ -184,8 +202,12 @@ static int compute_shortest_path(char* sql, int start_vertex,
   int ntuples;
   edge_t *edges = NULL;
   int total_tuples = 0;
+#ifndef _MSC_VER
   edge_columns_t edge_columns = {id: -1, source: -1, target: -1, 
                                  cost: -1, reverse_cost: -1};
+#else // _MSC_VER
+  edge_columns_t edge_columns = {-1, -1, -1, -1, -1};
+#endif // _MSC_VER
   int v_max_id=0;
   int v_min_id=INT_MAX;
 
@@ -352,7 +374,11 @@ static int compute_shortest_path(char* sql, int start_vertex,
 
 
 PG_FUNCTION_INFO_V1(shortest_path);
+#ifndef _MSC_VER
 Datum
+#else // _MSC_VER
+PGDLLEXPORT Datum
+#endif // _MSC_VER
 shortest_path(PG_FUNCTION_ARGS)
 {
   FuncCallContext     *funcctx;
@@ -461,3 +487,6 @@ shortest_path(PG_FUNCTION_ARGS)
     }
 }
 
+#ifdef _MSC_VER
+
+#endif // _MSC_VER

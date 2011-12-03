@@ -21,13 +21,13 @@
                    
 extern "C"
 {
-#include <gaul.h>
 #include <postgres.h>
+#include <gaul.h>
 }
 
 #include "tsp.h"
 
-using namespace std;
+//using namespace std;
 
 
 // Maximal number of nodes in the path (to avoid infinite loops)

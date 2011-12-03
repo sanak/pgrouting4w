@@ -1,0 +1,51 @@
+=============================================================
+Build pgRouting for Windows with Microsoft Visual Studio 2008
+=============================================================
+
+PostgreSQL
+-------------------------------------------------------------
+ Use latest version(9.1.1) (win32(x86) binary package)
+ Set "bin" path to environment variable("PATH")
+
+
+CMake
+-------------------------------------------------------------
+ Use latest version(2.8.6) (win32 binary package)
+ Set "bin" path to environment variable("PATH")
+
+
+Boost
+-------------------------------------------------------------
+ Use latest version(1.48.0)
+ >bootstrap.bat
+ >bjam toolset=msvc-9.0 --with-thread --prefix=D:\Build\local install
+
+
+Gaul
+-------------------------------------------------------------
+ Use latest version(0.1850-0)
+ Open "windows\gaul-windows.sln"
+ Edit "util\gaul\gaul_config_win.h"
+ #  define vsnprintf _vsnprintf
+ -> //#  define vsnprintf _vsnprintf
+ Copy "windows\Release\gaul-windows.lib" to "D:\Build\local\lib"
+ Copy "src\gaul.h" and "src\gaul" to "D:\Build\local\include"
+
+
+CGAL
+-------------------------------------------------------------
+ Use latest version(3.9)
+ >mkdir build\msvc90
+ >cd build\msvc90
+ >cmake -G"Visual Studio 9 2008" -DCMAKE_INSTALL_PREFIX=D:\Build\local -DBoost_INCLUDE_DIR:PATH=D:\Build\local\include\boost-1_48 -DBOOST_LIBRARYDIR=D:\Build\local\lib ..\..\
+ Open "build\msvc90\CGAL.sln" and build
+
+
+pgRouting
+-------------------------------------------------------------
+ >mkdir build\msvc90
+ >cd build\msvc90
+ >cmake -G"Visual Studio 9 2008" -DBoost_INCLUDE_DIR:PATH=D:\Build\local\include\boost-1_48 -DBOOST_THREAD_LIBRARIES:FILEPATH=D:\Build\local\lib\libboost_thread-vc90-mt-1_48.lib -DGAUL_INCLUDE_DIR:PATH=D:\Build\local\include -DGAUL_LIBRARIES:FILEPATH=D:\Build\local\lib\gaul-windows.lib -DGAUL_UTIL_LIBRARIES:FILEPATH=D:\Build\local\lib\gaul-windows.lib -DCGAL_INCLUDE_DIR:PATH=D:\Build\local\include -DCGAL_LIBRARIES:FILEPATH=D:\Build\local\lib\CGAL-vc90-mt.lib -DGMP_LIBRARIES:FILEPATH=D:\Build\local\lib\CGAL-vc90-mt.lib -DWITH_TSP=ON -DWITH_DD=ON ..\..\
+ Open "build\msvc90\PGROUTING.sln" and add following pathes to include directory, then build
+ - C:\Program Files (x86)\PostgreSQL\9.1\include
+ - C:\Program Files (x86)\PostgreSQL\9.1\include\server\port\win32_msvc

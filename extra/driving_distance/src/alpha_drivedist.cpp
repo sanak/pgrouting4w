@@ -38,8 +38,6 @@ corresponding to the Alpha shape.
 #include <vector>
 #include <list>
 
-#include "alpha.h"
-
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Triangulation_2.h>
 #include <CGAL/Triangulation_hierarchy_vertex_base_2.h>
@@ -49,6 +47,8 @@ corresponding to the Alpha shape.
 #include <CGAL/Alpha_shape_2.h>
 #include <CGAL/Alpha_shape_face_base_2.h>
 #include <CGAL/Alpha_shape_vertex_base_2.h>
+
+#include "alpha.h"
 
 typedef double coord_type;
 
