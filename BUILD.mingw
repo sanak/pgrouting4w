@@ -1,0 +1,78 @@
+=============================================================
+Build pgRouting for Windows with MinGW
+=============================================================
+
+
+MinGW/MSYS
+-------------------------------------------------------------
+ Use latest version(20111118)
+ See PostGIS Wiki's MinGW/MSYS part.
+ http://trac.osgeo.org/postgis/wiki/DevWikiWinMingWSys_20_MSVC#MinGWMSYS
+
+
+CMake
+-------------------------------------------------------------
+ Use latest version(2.8.6) (win32 binary package)
+ Set "bin" path to environment variable("PATH").
+
+
+Boost
+-------------------------------------------------------------
+ Use old version(1.46.1) because of boost/graph/detail/is_same.hpp issue
+ First, execute from Visual Studio 2008 Command Prompt
+ >bootstrap.bat
+ 
+ Then execute from MinGW
+ $ bjam toolset=gcc link=static threading=multi --with-thread --prefix=/usr/local install
+
+
+Gaul
+-------------------------------------------------------------
+ Use previous version(0.1849-0)
+ $ ./configure --enable-slang=no CFLAGS=-DBUILDING_DLL
+ Edit /src/Makefile
+         INCLUDES = -I../util/ -I../../util/
+          -> INCLUDES = -I../util -I../../util
+ Edit /tests/Makefile
+         INCLUDES = -I../util/ -I../../util/ -I../src/ -I../../src/ -I/usr/include/slang/
+          -> INCLUDES = -I../util -I../../util -I../src -I../../src -I/usr/include/slang/
+ $ make
+ $ make install
+
+
+CGAL
+-------------------------------------------------------------
+ Use latest version(3.9)
+ $ mkdir build/mingw
+ $ cd build/mingw
+ $ cmake -G"MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=/usr/local -DCMAKE_CXX_FLAGS:STRING="-DBOOST_THREAD_USE_LIB -DBoost_USE_STATIC_LIBS" -DBoost_INCLUDE_DIR:PATH=/usr/local/include/boost-1_46_1 -DBOOST_LIBRARYDIR:PATH=/usr/local/lib ../../
+
+
+PostgreSQL
+-------------------------------------------------------------
+ Use latest version(9.1.3)
+ Build from source for header include.
+ $ ./configure --prefix=/usr/local/postgresql-9.1.3
+ $ make
+ $ make install
+ $ cd /usr/local/postgresql-9.1.3/lib
+ $ mv libpq.a libpq.a.mingw
+
+ Then export library file for link EnterpriseDB. (run as adminstrator)
+ $ cd /c/PROGRA~2/PostgreSQL/9.1/lib
+ $ pexports libpq.dll > libpq.def
+ $ dlltool -U -d libpq.def -l libpq.a
+ $ cp libpq.a /usr/local/postgresql-9.1.3/lib/
+
+
+pgRouting
+-------------------------------------------------------------
+ $ mkdir build/mingw
+ $ cd build/mingw
+ $ cmake -G"MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=/usr/local -DCMAKE_SHARED_LINKER_FLAGS:STRING="-static-libgcc -static-libstdc++ -Wl,--enable-stdcall-fixup" -DPOSTGRESQL_INCLUDE_DIR:PATH=/usr/local/postgresql-9.1.3/include/server -DPOSTGRESQL_LIBRARIES:FILEPATH=/usr/local/postgresql-9.1.3/lib/libpostgres.a -DPOSTGRESQL_EXECUTABLE:PATH=/usr/local/postgresql-9.1.3/bin -DBoost_INCLUDE_DIR:PATH=/usr/local/include/boost-1_46_1 -DBOOST_THREAD_LIBRARIES:FILEPATH=/usr/local/lib/libboost_thread-mgw46-mt-1_46_1.a -DGAUL_INCLUDE_DIR:PATH=/usr/local/include -DGAUL_LIBRARIES:FILEPATH=/usr/local/lib/libgaul.a -DGAUL_UTIL_LIBRARIES:FILEPATH=/usr/local/lib/libgaul_util.a -DCGAL_INCLUDE_DIR:PATH=/usr/local/include -DCGAL_LIBRARIES:FILEPATH=/usr/local/lib/libCGAL.a -DGMP_LIBRARIES:FILEPATH=/usr/local/lib/libCGAL.a -DWITH_TSP=ON -DWITH_DD=ON ../../
+ $ make
+ $ make install
+ $ cd lib
+ $ strip librouting.dll
+ $ strip librouting_dd.dll
+ $ strip librouting_tsp.dll
