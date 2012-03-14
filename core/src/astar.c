@@ -90,7 +90,7 @@ PGDLLEXPORT Datum shortest_path_astar(PG_FUNCTION_ARGS);
 static char *
 text2char(text *in)
 {
-  char *out = palloc(VARSIZE(in));
+  char *out = (char*)palloc(VARSIZE(in));
 
   memcpy(out, VARDATA(in), VARSIZE(in) - VARHDRSZ);
   out[VARSIZE(in) - VARHDRSZ] = '\0';
@@ -268,7 +268,7 @@ static int compute_shortest_path_astar(char* sql, int source_vertex_id,
 {
   
   int SPIcode;
-  void *SPIplan;
+  SPIPlanPtr SPIplan;
   Portal SPIportal;
   bool moredata = TRUE;
   int ntuples;
@@ -335,9 +335,9 @@ static int compute_shortest_path_astar(char* sql, int source_vertex_id,
       ntuples = SPI_processed;
       total_tuples += ntuples;
       if (!edges)
-	edges = palloc(total_tuples * sizeof(edge_astar_t));
+	edges = (edge_astar_t*)palloc(total_tuples * sizeof(edge_astar_t));
       else
-	edges = repalloc(edges, total_tuples * sizeof(edge_astar_t));
+	edges = (edge_astar_t*)repalloc(edges, total_tuples * sizeof(edge_astar_t));
 
       if (edges == NULL) 
         {
@@ -561,8 +561,8 @@ shortest_path_astar(PG_FUNCTION_ARGS)
       nulls[3] = ' ';
       */
     
-      values = palloc(3 * sizeof(Datum));
-      nulls = palloc(3 * sizeof(char));
+      values = (Datum*)palloc(3 * sizeof(Datum));
+      nulls = (char*)palloc(3 * sizeof(char));
   
       values[0] = Int32GetDatum(path[call_cntr].vertex_id);
       nulls[0] = ' ';

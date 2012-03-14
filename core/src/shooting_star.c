@@ -59,7 +59,7 @@ PGDLLEXPORT Datum shortest_path_shooting_star(PG_FUNCTION_ARGS);
 static char *
 text2char(text *in)
 {
-  char *out = palloc(VARSIZE(in));
+  char *out = (char*)palloc(VARSIZE(in));
 
   memcpy(out, VARDATA(in), VARSIZE(in) - VARHDRSZ);
   out[VARSIZE(in) - VARHDRSZ] = '\0';
@@ -348,9 +348,9 @@ static int compute_shortest_path_shooting_star(char* sql, int source_edge_id,
       total_tuples += ntuples;
 
       if (!edges)
-	edges = palloc(total_tuples * sizeof(edge_shooting_star_t));
+	edges = (edge_shooting_star_t*)palloc(total_tuples * sizeof(edge_shooting_star_t));
       else
-	edges = repalloc(edges, total_tuples * sizeof(edge_shooting_star_t));
+	edges = (edge_shooting_star_t*)repalloc(edges, total_tuples * sizeof(edge_shooting_star_t));
 
       if (edges == NULL) 
         {
@@ -550,8 +550,8 @@ shortest_path_shooting_star(PG_FUNCTION_ARGS)
       nulls[3] = ' ';
       */
 		    
-      values = palloc(3 * sizeof(Datum));
-      nulls = palloc(3 * sizeof(char));
+      values = (Datum*)palloc(3 * sizeof(Datum));
+      nulls = (char*)palloc(3 * sizeof(char));
 
       values[0] = Int32GetDatum(path[call_cntr].vertex_id);
       nulls[0] = ' ';

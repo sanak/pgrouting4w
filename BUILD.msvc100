@@ -1,5 +1,5 @@
 =============================================================
-Build pgRouting for Windows with Microsoft Visual Studio 2008
+Build pgRouting for Windows with Microsoft Visual Studio 2010
 =============================================================
 
 PostgreSQL
@@ -18,7 +18,7 @@ Boost
 -------------------------------------------------------------
  Use latest version(1.48.0)
  >bootstrap.bat
- >bjam toolset=msvc-9.0 --with-thread --prefix=D:\Build\local install
+ >bjam toolset=msvc-10.0 --with-thread --prefix=D:\Build\local install
 
 
 Gaul
@@ -35,17 +35,17 @@ Gaul
 CGAL
 -------------------------------------------------------------
  Use latest version(3.9)
- >mkdir build\msvc90
- >cd build\msvc90
- >cmake -G"Visual Studio 9 2008" -DCMAKE_INSTALL_PREFIX=D:\Build\local -DBoost_INCLUDE_DIR:PATH=D:\Build\local\include\boost-1_48 -DBOOST_LIBRARYDIR=D:\Build\local\lib ..\..\
- Open "build\msvc90\CGAL.sln" and build
+ >mkdir build\msvc100
+ >cd build\msvc100
+ >cmake -G"Visual Studio 10" -DCMAKE_INSTALL_PREFIX=D:\Build\local -DBoost_INCLUDE_DIR:PATH=D:\Build\local\include\boost-1_48 -DBOOST_LIBRARYDIR=D:\Build\local\lib ..\..\
+ Open "build\msvc100\CGAL.sln" and build
 
 
 pgRouting
 -------------------------------------------------------------
- >mkdir build\msvc90
- >cd build\msvc90
- >cmake -G"Visual Studio 9 2008" -DBoost_INCLUDE_DIR:PATH=D:\Build\local\include\boost-1_48 -DBOOST_THREAD_LIBRARIES:FILEPATH=D:\Build\local\lib\libboost_thread-vc90-mt-1_48.lib -DGAUL_INCLUDE_DIR:PATH=D:\Build\local\include -DGAUL_LIBRARIES:FILEPATH=D:\Build\local\lib\gaul-windows.lib -DGAUL_UTIL_LIBRARIES:FILEPATH=D:\Build\local\lib\gaul-windows.lib -DCGAL_INCLUDE_DIR:PATH=D:\Build\local\include -DCGAL_LIBRARIES:FILEPATH=D:\Build\local\lib\CGAL-vc90-mt.lib -DGMP_LIBRARIES:FILEPATH=D:\Build\local\lib\CGAL-vc90-mt.lib -DWITH_TSP=ON -DWITH_DD=ON ..\..\
- Open "build\msvc90\PGROUTING.sln" and add following pathes to include directory, then build
+ >mkdir build\msvc100
+ >cd build\msvc100
+ >cmake -G"Visual Studio 10" -DBoost_INCLUDE_DIR:PATH=D:\Build\local\include\boost-1_48 -DBOOST_THREAD_LIBRARIES:FILEPATH=D:\Build\local\lib\libboost_thread-vc100-mt-1_48.lib -DGAUL_INCLUDE_DIR:PATH=D:\Build\local\include -DGAUL_LIBRARIES:FILEPATH=D:\Build\local\lib\gaul-windows.lib -DGAUL_UTIL_LIBRARIES:FILEPATH=D:\Build\local\lib\gaul-windows.lib -DCGAL_INCLUDE_DIR:PATH=D:\Build\local\include -DCGAL_LIBRARIES:FILEPATH=D:\Build\local\lib\CGAL-vc100-mt.lib -DGMP_LIBRARIES:FILEPATH=D:\Build\local\lib\CGAL-vc100-mt.lib -DWITH_TSP=ON -DWITH_DD=ON ..\..\
+ Open "build\msvc100\PGROUTING.sln" and add following pathes to include directory, then build
  - C:\Program Files (x86)\PostgreSQL\9.1\include
  - C:\Program Files (x86)\PostgreSQL\9.1\include\server\port\win32_msvc

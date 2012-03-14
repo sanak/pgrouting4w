@@ -138,7 +138,7 @@ graph_add_edge(G &graph, int index,
   if (cost < 0) // edges are inserted as unpassable if cost is negative
     cost = MAX_COST;
 
-  tie(e, inserted) = add_edge(source, target, graph);
+  boost::tie(e, inserted) = add_edge(source, target, graph);
 
   graph[e].cost = cost;
   graph[e].id = id;
@@ -296,7 +296,7 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
   
   graph_traits<graph_t>::edge_iterator ei, ei_end;
 
-  for(tie(ei, ei_end) = edges(graph); ei != ei_end; ++ei) 
+  for(boost::tie(ei, ei_end) = edges(graph); ei != ei_end; ++ei) 
   {
     if(graph[*ei].id == source_edge_id || graph[*ei].id == source_edge_id - e_max_id)
     {
@@ -314,7 +314,7 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
   }
 
 
-  for(tie(ei, ei_end) = edges(graph); ei != ei_end; ++ei) 
+  for(boost::tie(ei, ei_end) = edges(graph); ei != ei_end; ++ei) 
   {
     if(graph[*ei].id == target_edge_id || graph[*ei].id == target_edge_id - e_max_id)
     {

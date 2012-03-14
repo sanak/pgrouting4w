@@ -57,7 +57,7 @@ graph_add_edge(G &graph, int id, int source, int target, float8 cost)
   if (cost < 0) // edges are not inserted in the graph if cost is negative
     return;
   
-  tie(e, inserted) = add_edge(source, target, graph);
+  boost::tie(e, inserted) = add_edge(source, target, graph);
   
   graph[e].cost = cost;
   graph[e].id = id;
@@ -126,7 +126,7 @@ boost_dijkstra_dist(edge_t *edges, unsigned int count, int source_vertex_id,
   vector<path_element> path_vector;
   int j=0;
   
-  for(tie(vi, vend) = vertices(graph); vi != vend; vi++) {
+  for(boost::tie(vi, vend) = vertices(graph); vi != vend; vi++) {
                 
     if( (double)distances[*vi] <= rdistance ) {
       
