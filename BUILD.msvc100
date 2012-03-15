@@ -45,7 +45,7 @@ pgRouting
 -------------------------------------------------------------
  >mkdir build\msvc100
  >cd build\msvc100
- >cmake -G"Visual Studio 10" -DBoost_INCLUDE_DIR:PATH=D:\Build\local\include\boost-1_48 -DBOOST_THREAD_LIBRARIES:FILEPATH=D:\Build\local\lib\libboost_thread-vc100-mt-1_48.lib -DGAUL_INCLUDE_DIR:PATH=D:\Build\local\include -DGAUL_LIBRARIES:FILEPATH=D:\Build\local\lib\gaul-windows.lib -DGAUL_UTIL_LIBRARIES:FILEPATH=D:\Build\local\lib\gaul-windows.lib -DCGAL_INCLUDE_DIR:PATH=D:\Build\local\include -DCGAL_LIBRARIES:FILEPATH=D:\Build\local\lib\CGAL-vc100-mt.lib -DGMP_LIBRARIES:FILEPATH=D:\Build\local\lib\CGAL-vc100-mt.lib -DWITH_TSP=ON -DWITH_DD=ON ..\..\
+ >cmake -G"Visual Studio 10" -DPOSTGRESQL_INCLUDE_DIR:PATH="C:\Program Files (x86)\PostgreSQL\9.1\include\server" -DPOSTGRESQL_LIBRARIES:FILEPATH="C:\Program Files (x86)\PostgreSQL\9.1\lib\postgres.lib" -DPOSTGRESQL_EXECUTABLE:PATH="C:\Program Files (x86)\PostgreSQL\9.1\bin" -DBoost_INCLUDE_DIR:PATH=D:\Build\local\include\boost-1_48 -DBOOST_THREAD_LIBRARIES:FILEPATH=D:\Build\local\lib\libboost_thread-vc100-mt-1_48.lib -DGAUL_INCLUDE_DIR:PATH=D:\Build\local\include -DGAUL_LIBRARIES:FILEPATH=D:\Build\local\lib\gaul-windows.lib -DGAUL_UTIL_LIBRARIES:FILEPATH=D:\Build\local\lib\gaul-windows.lib -DCGAL_INCLUDE_DIR:PATH=D:\Build\local\include -DCGAL_LIBRARIES:FILEPATH=D:\Build\local\lib\CGAL-vc100-mt.lib -DGMP_LIBRARIES:FILEPATH=D:\Build\local\lib\CGAL-vc100-mt.lib -DWITH_TSP=ON -DWITH_DD=ON ..\..\
  Open "build\msvc100\PGROUTING.sln" and add following pathes to include directory, then build
  - C:\Program Files (x86)\PostgreSQL\9.1\include
  - C:\Program Files (x86)\PostgreSQL\9.1\include\server\port\win32_msvc

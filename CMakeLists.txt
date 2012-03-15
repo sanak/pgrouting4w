@@ -28,7 +28,7 @@ ELSE(Boost_INCLUDE_DIRS)
   MESSAGE(FATAL ERROR " Please check your Boost installation ") 
 ENDIF(Boost_INCLUDE_DIRS)
 
-EXEC_PROGRAM(pg_config
+EXEC_PROGRAM(${POSTGRESQL_EXECUTABLE}/pg_config
  ARGS --pkglibdir
  OUTPUT_VARIABLE LIB_DIR)
 
