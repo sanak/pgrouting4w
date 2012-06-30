@@ -21,8 +21,8 @@
                    
 extern "C"
 {
-#include <gaul.h>
 #include <postgres.h>
+#include <gaul.h>
 }
 
 #include "tsp.h"

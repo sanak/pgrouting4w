@@ -27,7 +27,7 @@ MinGW/MSYS
  
  Then set up the build directory:
  
- $ mkdir /d/build
+ $ mkdir /c/build
  
  * Above instruction is quoted from the following site.
    [PostGIS 2.0 Build Using MinGW/MSYS/VisualC++]
@@ -47,19 +47,18 @@ Boost
 -------------------------------------------------------------
  Use old version(1.46.1) because of boost/graph/detail/is_same.hpp issue
  
- $ cd /d/build
+ $ cd /c/build
  $ wget http://sourceforge.net/projects/boost/files/boost/1.46.1/boost_1_46_1.zip
  $ unzip boost_1_46_1.zip
  
  Execute from Command Prompt:
  
- >d:
- >cd d:\build\boost_1_46_1
+ >cd c:\build\boost_1_46_1
  >bootstrap.bat mingw
  
  Then execute from MinGW Shell:
  
- $ cd /d/build/boost_1_46_1
+ $ cd /c/build/boost_1_46_1
  $ bjam toolset=gcc link=static threading=multi --with-thread --prefix=/usr/local install
 
 
@@ -67,7 +66,7 @@ Gaul
 -------------------------------------------------------------
  Use previous version(0.1849-0)
  
- $ cd /d/build
+ $ cd /c/build
  $ wget http://prdownloads.sourceforge.net/gaul/gaul-devel-0.1849-0.tar.bz2?download
  $ tar xvfj gaul-devel-0.1849-0.tar.bz2
  $ cd gaul-devel-0.1849-0
@@ -89,9 +88,9 @@ CGAL
  Use latest version(3.9)
  
  Download CGAL-3.9.zip from http://www.cgal.org/download.html ,
- then put it into "d:\build\" directory.
+ then put it into "c:\build\" directory.
  
- $ cd /d/build
+ $ cd /c/build
  $ unzip CGAL-3.9.zip
  $ cd CGAL-3.9
  $ mkdir -p build/mingw
@@ -111,7 +110,7 @@ PostgreSQL
  
  Next, build source for header include:
  
- $ cd /d/build
+ $ cd /c/build
  $ wget http://ftp.postgresql.org/pub/source/v9.1.4/postgresql-9.1.4.tar.bz2
  $ tar xvfj postgresql-9.1.4.tar.bz2
  $ cd postgresql-9.1.4
