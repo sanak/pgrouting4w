@@ -2,6 +2,7 @@
 Build pgRouting for Windows with MinGW
 =============================================================
 
+Build environment assumes "Windows 7 64bit".
 
 MinGW/MSYS
 -------------------------------------------------------------
@@ -27,6 +28,9 @@ MinGW/MSYS
  Then set up the build directory:
  
  $ mkdir /c/build
+ 
+ Grant "full control" permission to "Users" and "Authenticated Users"
+ from "Folder Property" / "Security".
  
  * Above instruction is quoted from the following site.
    [PostGIS 2.0 Build Using MinGW/MSYS/VisualC++]
@@ -87,14 +91,11 @@ Gaul
  $ wget http://prdownloads.sourceforge.net/gaul/gaul-devel-0.1849-0.tar.bz2?download
  $ tar xvfj gaul-devel-0.1849-0.tar.bz2
  $ cd gaul-devel-0.1849-0
- $ ./configure --enable-slang=no CFLAGS=-DBUILDING_DLL
+ $ ./configure --enable-slang=no --enable-pthread=no --enable-shared=yes
 
- Edit src/Makefile
-        INCLUDES = -I../util/ -I../../util/
-          -> INCLUDES = -I../util -I../../util
- Edit tests/Makefile
-        INCLUDES = -I../util/ -I../../util/ -I../src/ -I../../src/ -I/usr/include/slang/
-          -> INCLUDES = -I../util -I../../util -I../src -I../../src -I/usr/include/slang
+ Edit "util/gaul/gaul_config.h" and "util/gaul/gaul_config_win.h"
+        #  define FUNCPROTO __declspec (dllimport)
+          -> #  define FUNCPROTO
  
  $ make
  $ make install

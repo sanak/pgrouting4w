@@ -21,8 +21,11 @@
                    
 extern "C"
 {
-#include <postgres.h>
 #include <gaul.h>
+#ifdef __MINGW64__
+#define ELOG_H
+#endif
+#include <postgres.h>
 }
 
 #include "tsp.h"

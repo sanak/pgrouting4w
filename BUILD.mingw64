@@ -2,6 +2,7 @@
 Build pgRouting for Windows with MinGW64
 =============================================================
 
+Build environment assumes "Windows 7 64bit".
 
 MinGW/MSYS
 -------------------------------------------------------------
@@ -18,6 +19,9 @@ MinGW/MSYS
  Then set up the build directory:
  
  $ mkdir /c/build64
+ 
+ Grant "full control" permission to "Users" and "Authenticated Users"
+ from "Folder Property" / "Security".
  
  * Above instruction is quoted from the following site.
    [Compiling using MingGW-w64 for 64-bit]
@@ -37,7 +41,7 @@ Boost
 -------------------------------------------------------------
  Use old version(1.46.1) because of boost/graph/detail/is_same.hpp issue
  
- $ cd /c/build
+ $ cd /c/build64
  $ wget http://sourceforge.net/projects/boost/files/boost/1.46.1/boost_1_46_1.zip
  $ unzip boost_1_46_1.zip
  $ cd boost_1_46_1
@@ -80,20 +84,17 @@ CGAL
 
 Gaul
 -------------------------------------------------------------
- Use latest version(0.1850-0)
+ Use previous version(0.1849-0)
  
  $ cd /c/build64
- $ wget http://sourceforge.net/projects/gaul/files/gaul-devel/0.1850-0/gaul-devel-0.1850-0.tar.gz/download
- $ tar xvfj gaul-devel-0.1850-0.tar.gz
- $ cd gaul-devel-0.1850-0
- $ ./configure --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --enable-slang=no CFLAGS=-DBUILDING_DLL
-
- Edit "util/gaul/gaul_config_win.h"
-        #define HAVE_MIN	1
-        #define HAVE_MAX	1
-          -> /*#define HAVE_MIN	1*/
-             /*#define HAVE_MAX	1*/
-             #define HAVE_GETHOSTNAME	1
+ $ wget http://prdownloads.sourceforge.net/gaul/gaul-devel-0.1849-0.tar.bz2?download
+ $ tar xvfj gaul-devel-0.1849-0.tar.bz2
+ $ cd gaul-devel-0.1849-0
+ $ ./configure --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --enable-slang=no --enable-pthread=no --enable-shared=yes
+ 
+ Edit "util/gaul/gaul_config.h" and "util/gaul/gaul_config_win.h"
+        #  define FUNCPROTO __declspec (dllimport)
+          -> #  define FUNCPROTO
  
  $ make
   *** If "values.h: No such file or directory" error occurred, execute as follows.
@@ -127,7 +128,7 @@ PostgreSQL
  
  $ cd /c/PROGRA~1/PostgreSQL/9.1/lib
  $ pexports libpq.dll > libpq.def
- *** If pexports not found, use "MinGW Shell"(32bit).
+  *** If pexports not found, use "MinGW Shell"(32bit).
  $ dlltool -U -d libpq.def -l libpq.a
  $ cp libpq.a /usr/local/postgresql-9.1.4/lib/
 
