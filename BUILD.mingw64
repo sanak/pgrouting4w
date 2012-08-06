@@ -1,0 +1,145 @@
+=============================================================
+Build pgRouting for Windows with MinGW64
+=============================================================
+
+Build environment assumes "Windows 7 64bit".
+
+MinGW/MSYS
+-------------------------------------------------------------
+ Use PostGIS MinGW64 package.
+ 
+ http://www.bostongis.com/postgisstuff/ming64.zip
+ 
+ Extract to c:\ming64, and launch the c:\ming64\msys\msys.bat
+ and extract pthreads library:
+ 
+ $ cd /mingw
+ $ unzip pthreads-w64.zip
+ 
+ Then set up the build directory:
+ 
+ $ mkdir /c/build64
+ 
+ Grant "full control" permission to "Users" and "Authenticated Users"
+ from "Folder Property" / "Security".
+ 
+ * Above instruction is quoted from the following site.
+   [Compiling using MingGW-w64 for 64-bit]
+   http://trac.osgeo.org/postgis/wiki/DevWikiWinMingW64
+
+
+CMake
+-------------------------------------------------------------
+ Use latest version(2.8.8) (win32 binary package)
+ 
+ http://www.cmake.org/files/v2.8/cmake-2.8.8-win32-x86.exe
+ 
+ Run the installer, and select 'Add CMake to the system PATH for xxx'.
+
+
+Boost
+-------------------------------------------------------------
+ Use old version(1.46.1) because of boost/graph/detail/is_same.hpp issue
+ 
+ $ cd /c/build64
+ $ wget http://sourceforge.net/projects/boost/files/boost/1.46.1/boost_1_46_1.zip
+ $ unzip boost_1_46_1.zip
+ $ cd boost_1_46_1
+ $ start cmd
+ 
+ Execute from Command Prompt:
+ 
+ >bootstrap.bat mingw
+ >exit
+ 
+ Then execute from MinGW Shell:
+ 
+ $ bjam toolset=gcc address-model=64 define=BOOST_USE_WINDOWS_H link=static threading=multi --with-thread --prefix=/usr/local install
+
+
+CGAL
+-------------------------------------------------------------
+ Use latest version(3.9)
+ 
+ Download CGAL-3.9.zip from http://www.cgal.org/download.html ,
+ then put it into "c:\build64\" directory.
+ 
+ $ cd /c/build64
+ $ unzip CGAL-3.9.zip
+ $ cd CGAL-3.9
+ $ mkdir -p build/mingw
+ $ cd build/mingw
+ $ cmake -G"MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=/usr/local -DCMAKE_CXX_FLAGS:STRING="-DBOOST_THREAD_USE_LIB -DBoost_USE_STATIC_LIBS -DBOOST_USE_WINDOWS_H" -DBoost_INCLUDE_DIR:PATH=/usr/local/include/boost-1_46_1 -DBOOST_LIBRARYDIR:PATH=/usr/local/lib ../../
+ 
+ Add a "#include <windows.h>" at the top of the "src/CGAL/all_files.cpp"
+ and "src/ImageIO/all_files.cpp".
+ 
+ $ make
+ $ make install
+
+ * Above instruction is quoted from the following site.
+   [cgal-discuss - Re [cgal-discuss] CGAL compilation with mingw64 it works! - arc]
+   https://sympa.inria.fr/sympa/arc/cgal-discuss/2011-10/msg00179.html
+
+
+Gaul
+-------------------------------------------------------------
+ Use previous version(0.1849-0)
+ 
+ $ cd /c/build64
+ $ wget http://prdownloads.sourceforge.net/gaul/gaul-devel-0.1849-0.tar.bz2?download
+ $ tar xvfj gaul-devel-0.1849-0.tar.bz2
+ $ cd gaul-devel-0.1849-0
+ $ ./configure --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --enable-slang=no --enable-pthread=no --enable-shared=yes
+ 
+ Edit "util/gaul/gaul_config.h" and "util/gaul/gaul_config_win.h"
+        #  define FUNCPROTO __declspec (dllimport)
+          -> #  define FUNCPROTO
+ 
+ $ make
+  *** If "values.h: No such file or directory" error occurred, execute as follows.
+  *** $ touch /mingw/x86_64-w64-mingw32/include/values.h
+  *** $ make
+ $ make install
+
+
+PostgreSQL
+-------------------------------------------------------------
+ Use latest version(9.1.4)
+ 
+ http://www.enterprisedb.com/postgresql-914-installers-win64?ls=Crossover&type=Crossover
+ 
+ Run the installer, and install PostGIS(1.x/2.x) from Stack Builder.
+ 
+ Next, build source for header include:
+ 
+ $ cd /c/build64
+ $ wget http://ftp.postgresql.org/pub/source/v9.1.4/postgresql-9.1.4.tar.bz2
+ $ tar xvfj postgresql-9.1.4.tar.bz2
+ $ cd postgresql-9.1.4
+ $ ./configure --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --disable-float8-byval --without-zlib --prefix=/usr/local/postgresql-9.1.4
+ $ make
+ $ make install
+ $ cd /usr/local/postgresql-9.1.4/lib
+ $ mv libpq.a libpq.a.mingw
+
+ Then export library file for link EnterpriseDB.
+ (Run "c:\ming64\msys\msys.bat" as adminstrator):
+ 
+ $ cd /c/PROGRA~1/PostgreSQL/9.1/lib
+ $ pexports libpq.dll > libpq.def
+  *** If pexports not found, use "MinGW Shell"(32bit).
+ $ dlltool -U -d libpq.def -l libpq.a
+ $ cp libpq.a /usr/local/postgresql-9.1.4/lib/
+
+
+pgRouting
+-------------------------------------------------------------
+
+ $ mkdir -p build/mingw
+ $ cd build/mingw
+ $ cmake -G"MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=/usr/local -DCMAKE_SHARED_LINKER_FLAGS:STRING="-static-libgcc -static-libstdc++ -Wl,--enable-stdcall-fixup" -DPOSTGRESQL_INCLUDE_DIR:PATH=/usr/local/postgresql-9.1.4/include/server -DPOSTGRESQL_LIBRARIES:FILEPATH=/usr/local/postgresql-9.1.4/lib/libpostgres.a -DPOSTGRESQL_EXECUTABLE:PATH=/usr/local/postgresql-9.1.4/bin -DBoost_INCLUDE_DIR:PATH=/usr/local/include/boost-1_46_1 -DBOOST_THREAD_LIBRARIES:FILEPATH=/usr/local/lib/libboost_thread-mgw45-mt-1_46_1.a -DGAUL_INCLUDE_DIR:PATH=/usr/local/include -DGAUL_LIBRARIES:FILEPATH=/usr/local/lib/libgaul.a -DGAUL_UTIL_LIBRARIES:FILEPATH=/usr/local/lib/libgaul_util.a -DCGAL_INCLUDE_DIR:PATH=/usr/local/include -DCGAL_LIBRARIES:FILEPATH=/usr/local/lib/libCGAL.a -DGMP_LIBRARIES:FILEPATH=/usr/local/lib/libCGAL.a -DWITH_TSP=ON -DWITH_DD=ON ../../
+ $ make
+ $ make install
+ $ cd lib
+ $ strip *.dll
