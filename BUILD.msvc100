@@ -1,0 +1,63 @@
+=============================================================
+Build pgRouting for Windows with Microsoft Visual Studio 2010
+=============================================================
+
+Build environment assumes "Windows 7 64bit".
+
+CMake
+-------------------------------------------------------------
+ Use latest version(2.8.8) (win32 binary package)
+
+ http://www.cmake.org/files/v2.8/cmake-2.8.8-win32-x86.exe
+ 
+ Run the installer, and select 'Add CMake to the system PATH for xxx'.
+
+
+Boost
+-------------------------------------------------------------
+ Use previous version(1.49.0)
+ 
+ >bootstrap.bat
+ >bjam toolset=msvc-10.0 address-model=32 link=static threading=multi --with-thread --prefix=c:\build\local\msvc100\x86 install
+
+
+CGAL
+-------------------------------------------------------------
+ Use latest version(3.9)
+ 
+ >mkdir build\msvc100
+ >cd build\msvc100
+ >cmake -G"Visual Studio 10" -DCMAKE_INSTALL_PREFIX=c:\build\local\msvc100\x86 -DBoost_INCLUDE_DIR:PATH=c:\build\local\msvc100\x86\include\boost-1_49 -DBOOST_LIBRARYDIR=c:\build\local\msvc100\x86\lib ..\..\
+ 
+ Open "build\msvc100\CGAL.sln" and build.
+
+
+Gaul
+-------------------------------------------------------------
+ Use latest version(0.1850-0)
+ 
+ Open "windows\gaul-windows.sln"
+ Edit "util\gaul\gaul_config_win.h"
+ #  define vsnprintf _vsnprintf
+ -> //#  define vsnprintf _vsnprintf
+ Copy "windows\Release\gaul-windows.lib" to "c:\build\local\msvc100\x86\lib"
+ Copy "src\gaul.h" and "src\gaul" and "util\gaul" to "c:\build\local\msvc100\x86\include"
+
+
+PostgreSQL
+-------------------------------------------------------------
+ Use latest version(9.1.4)
+ 
+ http://www.enterprisedb.com/postgresql-914-installers-win32?ls=Crossover&type=Crossover
+ 
+ Run the installer, and install PostGIS(1.x/2.x) from Stack Builder.
+
+
+pgRouting
+-------------------------------------------------------------
+
+ >mkdir build\msvc100
+ >cd build\msvc100
+ >cmake -G"Visual Studio 10" -DPOSTGRESQL_INCLUDE_DIR:PATH="c:\PROGRA~2\PostgreSQL\9.1\include;c:\PROGRA~2\PostgreSQL\9.1\include\server;c:\PROGRA~2\PostgreSQL\9.1\include\server;c:\PROGRA~2\PostgreSQL\9.1\include\server\port;c:\PROGRA~2\PostgreSQL\9.1\include\server\port\win32;c:\PROGRA~2\PostgreSQL\9.1\include\server\port\win32_msvc" -DPOSTGRESQL_LIBRARIES:FILEPATH=c:\PROGRA~2\PostgreSQL\9.1\lib\postgres.lib -DPOSTGRESQL_EXECUTABLE:PATH=c:\PROGRA~2\PostgreSQL\9.1\bin -DBoost_INCLUDE_DIR:PATH=c:\build\local\msvc100\x86\include\boost-1_49 -DBOOST_THREAD_LIBRARIES:FILEPATH=c:\build\local\msvc100\x86\lib\libboost_thread-vc100-mt-1_49.lib -DGAUL_INCLUDE_DIR:PATH=c:\build\local\msvc100\x86\include -DGAUL_LIBRARIES:FILEPATH=c:\build\local\msvc100\x86\lib\gaul-windows.lib -DGAUL_UTIL_LIBRARIES:FILEPATH=c:\build\local\msvc100\x86\lib\gaul-windows.lib -DCGAL_INCLUDE_DIR:PATH=c:\build\local\msvc100\x86\include -DCGAL_LIBRARIES:FILEPATH=c:\build\local\msvc100\x86\lib\CGAL-vc100-mt.lib -DGMP_LIBRARIES:FILEPATH=c:\build\local\msvc100\x86\lib\CGAL-vc100-mt.lib -DWITH_TSP=ON -DWITH_DD=ON ..\..\
+
+ Open "build\msvc100\PGROUTING.sln" and build.

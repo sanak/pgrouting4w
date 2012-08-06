@@ -149,7 +149,7 @@ namespace boost
       vis.examine_edge(e, g, e_max_id);
       
       // For all adjacent edges for the current one
-      for (tie(ei, ei_end) = out_edges(target(e, g), g); ei != ei_end; ++ei) 
+      for (boost::tie(ei, ei_end) = out_edges(target(e, g), g); ei != ei_end; ++ei) 
       {
         // Get a color
         EdgeColorValue e_color = get(edge_color, *ei);
@@ -476,12 +476,12 @@ namespace boost
     typename graph_traits<VertexAndEdgeListGraph>::vertex_iterator ui, ui_end;
     typename graph_traits<VertexAndEdgeListGraph>::edge_iterator ei, ei_end;
 
-    for (tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) 
+    for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) 
     {
       vis.initialize_vertex(*ui, g);
     }
 
-    for (tie(ei, ei_end) = edges(g); ei != ei_end; ++ei) 
+    for (boost::tie(ei, ei_end) = edges(g); ei != ei_end; ++ei) 
     {
       put(distance, *ei, inf);
       put(edge_color, *ei, EdgeColor::white());

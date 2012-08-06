@@ -21,16 +21,16 @@
                    
 extern "C"
 {
-#include <gaul.h>
-#ifdef __MINGW64__
+#if defined(__MINGW64__)
 #define ELOG_H
 #endif
 #include <postgres.h>
+#include <gaul.h>
 }
 
 #include "tsp.h"
 
-using namespace std;
+//using namespace std;
 
 
 // Maximal number of nodes in the path (to avoid infinite loops)

@@ -19,9 +19,10 @@
  *
  */
  
+#ifndef _ALPHA_H
 #define _ALPHA_H
 
-#ifdef __MINGW64__
+#if defined(__MINGW64__) || defined(_MSC_VER)
 #define ELOG_H
 #endif
 #include "postgres.h"
@@ -41,9 +42,11 @@ extern "C"
                                                                      
   int alpha_shape(vertex_t *vertices, unsigned int count, 
                   vertex_t **res, int *res_count, char **err_msg);
-
+#ifdef _MSC_VER
+  void DBG(const char* format, ...);
+#endif // _MSC_VER
 #ifdef __cplusplus
 }
 #endif
-
+#endif // _ALPHA_H
                                         

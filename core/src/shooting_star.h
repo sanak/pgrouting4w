@@ -19,6 +19,7 @@
  *
  */
 
+#ifndef _SHOOTING_STAR_H
 #define _SHOOTING_STAR_H
 #define MAX_RULE_LENGTH 5
 
@@ -26,6 +27,7 @@
 #define MAX_COST  10000000
 
 #include "postgres.h"
+#include "dijkstra.h"
 
 typedef struct edge_shooting_star 
 {
@@ -43,6 +45,7 @@ typedef struct edge_shooting_star
   int rule[MAX_RULE_LENGTH];
 } edge_shooting_star_t;
 
+/*
 //I had to redeclare this. I couldn't include dijkstra.h 'cause
 //struct edge conflicts with function adjacency_list::edge()
 typedef struct path_element
@@ -51,6 +54,7 @@ typedef struct path_element
   int edge_id;
   float8 cost;
 } path_element_t;
+*/
 
 #ifdef __cplusplus
 extern "C"
@@ -64,3 +68,4 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+#endif // _SHOOTING_STAR_H

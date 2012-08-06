@@ -19,6 +19,7 @@
  *
  */
  
+#ifndef _TSP_H
 #define _TSP_H
 #define MAX_TOWNS 40
 
@@ -42,3 +43,4 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+#endif // _TSP_H

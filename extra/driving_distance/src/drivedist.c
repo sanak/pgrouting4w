@@ -60,18 +60,23 @@ long profipts1, profipts2, profopts;
 
 
 //----------------------------------------------------------------------------
-
+#ifndef _MSC_VER
 Datum driving_distance(PG_FUNCTION_ARGS);
+#else // _MSC_VER
+PGDLLEXPORT Datum driving_distance(PG_FUNCTION_ARGS);
+#endif // _MSC_VER
 
 #undef DEBUG
 //#define DEBUG 1
 
+#ifndef _MSC_VER
 #ifdef DEBUG
 #define DBG(format, arg...)                     \
     elog(NOTICE, format , ## arg)
 #else
 #define DBG(format, arg...) do { ; } while (0)
 #endif
+#endif // _MSC_VER
 
 // The number of tuples to fetch from the SPI cursor at each iteration
 #define TUPLIMIT 1000
@@ -217,9 +222,12 @@ static int compute_driving_distance(char* sql, int source_vertex_id,
   int ntuples;
   edge_t *edges = NULL;
   int total_tuples = 0;
+#ifndef _MSC_VER
   edge_columns_t edge_columns = {id: -1, source: -1, target: -1, 
                                  cost: -1, reverse_cost: -1};
-
+#else // _MSC_VER
+  edge_columns_t edge_columns = {-1, -1, -1, -1, -1};
+#endif // _MSC_VER
   int v_max_id=0;
   int v_min_id=INT_MAX;
 
@@ -368,7 +376,11 @@ static int compute_driving_distance(char* sql, int source_vertex_id,
 
 
 PG_FUNCTION_INFO_V1(driving_distance);
+#ifndef _MSC_VER
 Datum
+#else // _MSC_VER
+PGDLLEXPORT Datum
+#endif // _MSC_VER
 driving_distance(PG_FUNCTION_ARGS)
 {
   FuncCallContext     *funcctx;

@@ -22,16 +22,22 @@
 #ifndef _DRIVEDIST_H
 #define _DRIVEDIST_H
 
+#ifdef _MSC_VER
+#define ELOG_H
+#endif // _MSC_VER
 #include "postgres.h"
 #include "dijkstra.h"
 
 #ifdef __cplusplus
 extern "C"
+{
 #endif
 
 int boost_dijkstra_dist(edge_t *edges, unsigned int count, 
                    int source_vertex_id, double rdistance,
 		   bool directed, bool has_reverse_cost,
                    path_element_t **path, int *path_count, char **err_msg);
-
+#ifdef __cplusplus
+}
 #endif
+#endif // _DRIVEDIST_H

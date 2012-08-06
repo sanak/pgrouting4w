@@ -30,7 +30,7 @@
 Takes a list of points and returns a list of segments 
 corresponding to the Alpha shape.
 ************************************************************************/
-#ifdef __MINGW64__
+#if defined(__MINGW64__)
 #include <windows.h>
 namespace boost {
   void tss_cleanup_implemented() { }
@@ -43,8 +43,6 @@ namespace boost {
 #include <vector>
 #include <list>
 
-#include "alpha.h"
-
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Triangulation_2.h>
 #include <CGAL/Triangulation_hierarchy_vertex_base_2.h>
@@ -54,6 +52,8 @@ namespace boost {
 #include <CGAL/Alpha_shape_2.h>
 #include <CGAL/Alpha_shape_face_base_2.h>
 #include <CGAL/Alpha_shape_vertex_base_2.h>
+
+#include "alpha.h"
 
 typedef double coord_type;
 

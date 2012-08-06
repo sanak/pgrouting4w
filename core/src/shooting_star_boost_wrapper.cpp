@@ -34,7 +34,7 @@
 using namespace std;
 using namespace boost;
 
-struct Edge
+struct EdgeS
 {
   int id;
   int source;
@@ -48,7 +48,7 @@ struct Edge
   std::size_t index;
 };
 	
-struct Vertex
+struct VertexS
 {
   int id;
   float8 x;
@@ -56,55 +56,55 @@ struct Vertex
 };
 
 // exception for termination
-template <class Edge>
-class found_goal 
+template <class EdgeS>
+class shooting_star_found_goal 
 {
   public:
-    found_goal() {}
-    found_goal(Edge target) : target_edge(target) {}
-    found_goal(const found_goal &fg) {}
-    ~found_goal() {}
-    Edge get_target()
+    shooting_star_found_goal() {}
+    shooting_star_found_goal(EdgeS target) : target_edge(target) {}
+    shooting_star_found_goal(const shooting_star_found_goal &fg) {}
+    ~shooting_star_found_goal() {}
+    EdgeS get_target()
     {
       return target_edge;
     }
   private:
-    Edge target_edge;
+    EdgeS target_edge;
 };
 
 
 // visitor that terminates when we find the goal
-template <class Edge>
+template <class EdgeS>
 class shooting_star_goal_visitor : public boost::default_shooting_star_visitor
 {
 public:
-  shooting_star_goal_visitor(Edge goal, int max_id) : m_goal(goal){}
+  shooting_star_goal_visitor(EdgeS goal, int max_id) : m_goal(goal){}
   shooting_star_goal_visitor(const shooting_star_goal_visitor &gv) : m_goal(gv.m_goal){}
   ~shooting_star_goal_visitor(){}
 
   template <class Graph>
-  void examine_edge(Edge e, Graph& g, int e_max_id) 
+  void examine_edge(EdgeS e, Graph& g, int e_max_id) 
   {
     if( g[e].id == g[m_goal].id || g[e].id == g[m_goal].id + e_max_id )
     {
-      throw found_goal<Edge>(e);
+      throw shooting_star_found_goal<EdgeS>(e);
     }
   }
   template <class Graph>
-  void finish_edge(Edge e, Graph& g) {}
+  void finish_edge(EdgeS e, Graph& g) {}
 private:
-  Edge m_goal;
+  EdgeS m_goal;
   int e_max_id;
 };
 
 // Heuristic function
 template <class Graph, class CostType>
-class distance_heuristic
+class shooting_star_distance_heuristic
 {
 public:
-  typedef typename graph_traits<Graph>::edge_descriptor Edge;
-  distance_heuristic(Graph& g, Edge goal):m_g(g), m_goal(goal){}
-  CostType operator()(Edge e)
+  typedef typename graph_traits<Graph>::edge_descriptor EdgeS;
+  shooting_star_distance_heuristic(Graph& g, EdgeS goal):m_g(g), m_goal(goal){}
+  CostType operator()(EdgeS e)
   {
     CostType dx = m_g[source(m_goal, m_g)].x - m_g[source(e, m_g)].x;
     CostType dxt = m_g[target(m_goal, m_g)].x - m_g[target(e, m_g)].x;
@@ -119,7 +119,7 @@ public:
   } 
 private:
   Graph& m_g;
-  Edge m_goal;
+  EdgeS m_goal;
 };
 
 
@@ -139,7 +139,7 @@ graph_add_edge(G &graph, int index,
   if (cost < 0) // edges are inserted as unpassable if cost is negative
     cost = MAX_COST;
 
-  tie(e, inserted) = add_edge(source, target, graph);
+  boost::tie(e, inserted) = add_edge(source, target, graph);
 
   graph[e].cost = cost;
   graph[e].id = id;
@@ -155,9 +155,9 @@ graph_add_edge(G &graph, int index,
   graph[e].index = index;
 
   
-  typedef typename graph_traits<G>::vertex_descriptor Vertex;
-  Vertex s = vertex(source, graph);
-  Vertex t = vertex(target, graph);
+  typedef typename graph_traits<G>::vertex_descriptor VertexS;
+  VertexS s = vertex(source, graph);
+  VertexS t = vertex(target, graph);
 
   graph[s].id=source;
   graph[t].id=target;
@@ -179,7 +179,7 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
 	    path_element_t **path, int *path_count, char **err_msg, int e_max_id)
 {
 
-  typedef adjacency_list<vecS, vecS, directedS, Vertex, Edge> graph_t;
+  typedef adjacency_list<vecS, vecS, directedS, VertexS, EdgeS> graph_t;
 
   typedef graph_traits < graph_t >::vertex_descriptor vertex_descriptor;
   typedef graph_traits < graph_t >::edge_descriptor edge_descriptor;
@@ -202,7 +202,7 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
 
   for (std::size_t j = 0; j < count; ++j)
   {
-    //Vertex ids renumbering moved here
+    //VertexS ids renumbering moved here
     src = edges_array[j].source;
     trg = edges_array[j].target;
     
@@ -297,7 +297,7 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
   
   graph_traits<graph_t>::edge_iterator ei, ei_end;
 
-  for(tie(ei, ei_end) = edges(graph); ei != ei_end; ++ei) 
+  for(boost::tie(ei, ei_end) = edges(graph); ei != ei_end; ++ei) 
   {
     if(graph[*ei].id == source_edge_id || graph[*ei].id == source_edge_id - e_max_id)
     {
@@ -315,7 +315,7 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
   }
 
 
-  for(tie(ei, ei_end) = edges(graph); ei != ei_end; ++ei) 
+  for(boost::tie(ei, ei_end) = edges(graph); ei != ei_end; ++ei) 
   {
     if(graph[*ei].id == target_edge_id || graph[*ei].id == target_edge_id - e_max_id)
     {
@@ -332,22 +332,22 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
     return -3;
   }
 
-  property_map<graph_t, std::size_t Edge::*>::type edge_index = get(&Edge::index, graph);
+  property_map<graph_t, std::size_t EdgeS::*>::type edge_index = get(&EdgeS::index, graph);
 
   std::map< int, edge_descriptor, std::less<int> > predecessors;
   
-  property_map<graph_t, float Edge::*>::type rank = get(&Edge::rank, graph);
-  property_map<graph_t, float Edge::*>::type distance = get(&Edge::distance, graph);
+  property_map<graph_t, float EdgeS::*>::type rank = get(&EdgeS::rank, graph);
+  property_map<graph_t, float EdgeS::*>::type distance = get(&EdgeS::distance, graph);
 
   try 
   {
     //calling Shooting* search
     shooting_star_search
       (graph, source_edge,
-       distance_heuristic<graph_t, float>(graph, target_edge),
-       weight_map(get(&Edge::cost, graph)).
-       weight_map2(get(&Edge::adjacent_edges, graph)).
-       edge_color_map(get(&Edge::color, graph)).
+       shooting_star_distance_heuristic<graph_t, float>(graph, target_edge),
+       weight_map(get(&EdgeS::cost, graph)).
+       weight_map2(get(&EdgeS::adjacent_edges, graph)).
+       edge_color_map(get(&EdgeS::color, graph)).
        visitor(shooting_star_goal_visitor<edge_descriptor>(target_edge, e_max_id)),
        edge_index,
        distance, rank,
@@ -355,7 +355,7 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
        );
 
   } 
-  catch(found_goal<edge_descriptor> &fg) 
+  catch(shooting_star_found_goal<edge_descriptor> &fg) 
   {
   
     vector<edge_descriptor> path_vect;

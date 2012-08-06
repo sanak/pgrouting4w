@@ -28,17 +28,35 @@
 
 #include "dijkstra.h"
 
+#ifndef _MSC_VER
 Datum shortest_path(PG_FUNCTION_ARGS);
+#else // _MSC_VER
+PGDLLEXPORT Datum shortest_path(PG_FUNCTION_ARGS);
+#endif // _MSC_VER
 
 #undef DEBUG
 //#define DEBUG 1
 
+#ifndef _MSC_VER
 #ifdef DEBUG
 #define DBG(format, arg...)                     \
     elog(NOTICE, format , ## arg)
 #else
 #define DBG(format, arg...) do { ; } while (0)
 #endif
+#else // _MSC_VER
+extern void DBG(const char *format, ...)
+{
+#if DEBUG
+	va_list ap;
+	char msg[256];
+	va_start(ap, format);
+	_vsprintf_p(msg, 256, format, ap);
+	va_end(ap);
+	elog(NOTICE, msg);
+#endif
+}
+#endif // _MSC_VER
 
 // The number of tuples to fetch from the SPI cursor at each iteration
 #define TUPLIMIT 1000
@@ -50,7 +68,7 @@ PG_MODULE_MAGIC;
 static char *
 text2char(text *in)
 {
-  char *out = palloc(VARSIZE(in));
+  char *out = (char*)palloc(VARSIZE(in));
 
   memcpy(out, VARDATA(in), VARSIZE(in) - VARHDRSZ);
   out[VARSIZE(in) - VARHDRSZ] = '\0';
@@ -178,14 +196,18 @@ static int compute_shortest_path(char* sql, int start_vertex,
 {
 
   int SPIcode;
-  void *SPIplan;
+  SPIPlanPtr SPIplan;
   Portal SPIportal;
   bool moredata = TRUE;
   int ntuples;
   edge_t *edges = NULL;
   int total_tuples = 0;
+#ifndef _MSC_VER
   edge_columns_t edge_columns = {id: -1, source: -1, target: -1, 
                                  cost: -1, reverse_cost: -1};
+#else // _MSC_VER
+  edge_columns_t edge_columns = {-1, -1, -1, -1, -1};
+#endif // _MSC_VER
   int v_max_id=0;
   int v_min_id=INT_MAX;
 
@@ -232,9 +254,9 @@ static int compute_shortest_path(char* sql, int start_vertex,
       ntuples = SPI_processed;
       total_tuples += ntuples;
       if (!edges)
-        edges = palloc(total_tuples * sizeof(edge_t));
+        edges = (edge_t*)palloc(total_tuples * sizeof(edge_t));
       else
-        edges = repalloc(edges, total_tuples * sizeof(edge_t));
+        edges = (edge_t*)repalloc(edges, total_tuples * sizeof(edge_t));
 
       if (edges == NULL) 
         {
@@ -352,7 +374,11 @@ static int compute_shortest_path(char* sql, int start_vertex,
 
 
 PG_FUNCTION_INFO_V1(shortest_path);
+#ifndef _MSC_VER
 Datum
+#else // _MSC_VER
+PGDLLEXPORT Datum
+#endif // _MSC_VER
 shortest_path(PG_FUNCTION_ARGS)
 {
   FuncCallContext     *funcctx;
@@ -434,8 +460,8 @@ shortest_path(PG_FUNCTION_ARGS)
       nulls[3] = ' ';
       */
     
-      values = palloc(3 * sizeof(Datum));
-      nulls = palloc(3 * sizeof(char));
+      values = (Datum*)palloc(3 * sizeof(Datum));
+      nulls = (char*)palloc(3 * sizeof(char));
 
       values[0] = Int32GetDatum(path[call_cntr].vertex_id);
       nulls[0] = ' ';
@@ -461,3 +487,6 @@ shortest_path(PG_FUNCTION_ARGS)
     }
 }
 
+#ifdef _MSC_VER
+
+#endif // _MSC_VER

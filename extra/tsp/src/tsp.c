@@ -69,18 +69,35 @@ long profipts1, profipts2, profopts;
 #endif // PROFILE
 
 // ------------------------------------------------------------------------
-
+#ifndef _MSC_VER
 Datum tsp(PG_FUNCTION_ARGS);
+#else // _MSC_VER
+PGDLLEXPORT Datum tsp(PG_FUNCTION_ARGS);
+#endif // _MSC_VER
 
 #undef DEBUG
 //#define DEBUG 1
 
+#ifndef _MSC_VER
 #ifdef DEBUG
 #define DBG(format, arg...)                     \
     elog(NOTICE, format , ## arg)
 #else
 #define DBG(format, arg...) do { ; } while (0)
 #endif
+#else // _MSC_VER
+extern void DBG(const char *format, ...)
+{
+#if DEBUG
+	va_list ap;
+	char msg[256];
+	va_start(ap, format);
+	_vsprintf_p(msg, 256, format, ap);
+	va_end(ap);
+	elog(NOTICE, msg);
+#endif
+}
+#endif // _MSC_VER
 
 // The number of tuples to fetch from the SPI cursor at each iteration
 #define TUPLIMIT 1000
@@ -199,7 +216,11 @@ static int solve_tsp(char* sql, char* p_ids,
   int ids[MAX_TOWNS];
 
   point_t *points=NULL;
+#ifndef _MSC_VER
   point_columns_t point_columns = {id: -1, x: -1, y:-1};
+#else // _MSC_VER
+  point_columns_t point_columns = {-1, -1, -1};
+#endif // _MSC_VER
 
   char *err_msg = NULL;
   int ret = -1;
@@ -368,7 +389,11 @@ static int solve_tsp(char* sql, char* p_ids,
 }
 
 PG_FUNCTION_INFO_V1(tsp);
+#ifndef _MSC_VER
 Datum
+#else // _MSC_VER
+PGDLLEXPORT Datum
+#endif // _MSC_VER
 tsp(PG_FUNCTION_ARGS)
 {
   FuncCallContext     *funcctx;

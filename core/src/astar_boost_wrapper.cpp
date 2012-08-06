@@ -36,14 +36,14 @@ using namespace boost;
 // Maximal number of nodes in the path (to avoid infinite loops)
 #define MAX_NODES 100000000
 
-struct Edge
+struct EdgeA
 {
   int id;
   float8 cost;
   //float8 distance;
 };
 	
-struct Vertex
+struct VertexA
 {
   int id;
   float8 x;
@@ -51,21 +51,21 @@ struct Vertex
 };
 
 
-struct found_goal {}; // exception for termination
+struct astar_found_goal {}; // exception for termination
 
 // visitor that terminates when we find the goal
-template <class Vertex>
+template <class VertexA>
 class astar_goal_visitor : public boost::default_astar_visitor
 {
 public:
-  astar_goal_visitor(Vertex goal) : m_goal(goal) {}
+  astar_goal_visitor(VertexA goal) : m_goal(goal) {}
   template <class Graph>
-  void examine_vertex(Vertex u, Graph& g) {
+  void examine_vertex(VertexA u, Graph& g) {
     if(u == m_goal)
-      throw found_goal();
+      throw astar_found_goal();
   }
 private:
-  Vertex m_goal;
+  VertexA m_goal;
 };
 
 // Heuristic function which tells us how far the current node is
@@ -73,12 +73,12 @@ private:
 //
 // (|dx|+|dy|)/2 is used currently.
 template <class Graph, class CostType>
-class distance_heuristic : public astar_heuristic<Graph, CostType>
+class astar_distance_heuristic : public astar_heuristic<Graph, CostType>
 {
 public:
-  typedef typename graph_traits<Graph>::vertex_descriptor Vertex;
-  distance_heuristic(Graph& g, Vertex goal):m_g(g), m_goal(goal){}
-  CostType operator()(Vertex u)
+  typedef typename graph_traits<Graph>::vertex_descriptor VertexA;
+  astar_distance_heuristic(Graph& g, VertexA goal):m_g(g), m_goal(goal){}
+  CostType operator()(VertexA u)
   {
     CostType dx = m_g[m_goal].x - m_g[u].x;
     CostType dy = m_g[m_goal].y - m_g[u].y;
@@ -90,12 +90,12 @@ public:
   } 
 private:
   Graph& m_g;
-  Vertex m_goal;
+  VertexA m_goal;
 };
 
 
 // Adds an edge to the graph.
-// Edge id, cost, source and target ids and coordinates are copied also
+// EdgeA id, cost, source and target ids and coordinates are copied also
 template <class G, class E>
 static void
 graph_add_edge(G &graph, int id, int source, int target, 
@@ -107,14 +107,14 @@ graph_add_edge(G &graph, int id, int source, int target,
   if (cost < 0) // edges are not inserted in the graph if cost is negative
     return;
 
-  tie(e, inserted) = add_edge(source, target, graph);
+  boost::tie(e, inserted) = add_edge(source, target, graph);
 
   graph[e].cost = cost;
   graph[e].id = id;
 
-  typedef typename graph_traits<G>::vertex_descriptor Vertex;
-  Vertex s = vertex(source, graph);
-  Vertex t = vertex(target, graph);
+  typedef typename graph_traits<G>::vertex_descriptor VertexA;
+  VertexA s = vertex(source, graph);
+  VertexA t = vertex(target, graph);
   graph[s].x=s_x;
   graph[s].y=s_y;
   graph[t].x=t_x;
@@ -129,7 +129,7 @@ boost_astar(edge_astar_t *edges, unsigned int count,
 {
 
   // FIXME: use a template for the directedS parameters
-  typedef adjacency_list < listS, vecS, directedS, Vertex, Edge> graph_t;
+  typedef adjacency_list < listS, vecS, directedS, VertexA, EdgeA> graph_t;
 
   typedef graph_traits < graph_t >::vertex_descriptor vertex_descriptor;
   typedef graph_traits < graph_t >::edge_descriptor edge_descriptor;
@@ -200,14 +200,14 @@ boost_astar(edge_astar_t *edges, unsigned int count,
     // Call A* named parameter interface
     astar_search
       (graph, source_vertex,
-       distance_heuristic<graph_t, float>(graph, target_vertex),
+       astar_distance_heuristic<graph_t, float>(graph, target_vertex),
        predecessor_map(&predecessors[0]).
-       weight_map(get(&Edge::cost, graph)).
+       weight_map(get(&EdgeA::cost, graph)).
        distance_map(&distances[0]).
        visitor(astar_goal_visitor<vertex_descriptor>(target_vertex)));
 
   } 
-  catch(found_goal fg) {
+  catch(astar_found_goal fg) {
     // Target vertex found
     vector<int> path_vect;
     int max = MAX_NODES;
@@ -255,7 +255,7 @@ boost_astar(edge_astar_t *edges, unsigned int count,
         v_src = path_vect.at(i);
         v_targ = path_vect.at(i - 1);
 
-        for (tie(out_i, out_end) = out_edges(v_src, graph); 
+        for (boost::tie(out_i, out_end) = out_edges(v_src, graph); 
              out_i != out_end; ++out_i)
 	  {
             graph_traits < graph_t >::vertex_descriptor v, targ;
