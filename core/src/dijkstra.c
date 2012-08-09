@@ -486,7 +486,3 @@ shortest_path(PG_FUNCTION_ARGS)
       SRF_RETURN_DONE(funcctx);
     }
 }
-
-#ifdef _MSC_VER
-
-#endif // _MSC_VER
