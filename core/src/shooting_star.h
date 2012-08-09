@@ -1,23 +1,23 @@
 /*
- * Shooting* shortest path algorithm for PostgreSQL
- *
- * Copyright (c) 2007 Anton A. Patrushev, Orkney, Inc.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *
- */
+* Shooting* shortest path algorithm for PostgreSQL
+*
+* Copyright (c) 2007 Anton A. Patrushev, Orkney, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+*
+*/
 
 #ifndef _SHOOTING_STAR_H
 #define _SHOOTING_STAR_H
@@ -61,10 +61,10 @@ extern "C"
 {
 #endif
   int boost_shooting_star(edge_shooting_star_t *edges, unsigned int count, 
-                  int source_edge_id, int target_edge_id,
-                  bool directed, bool has_reverse_cost,
-                  path_element_t **path, int *path_count, char **err_msg,
-		  int e_max_id);
+                          int source_edge_id, int target_edge_id,
+                          bool directed, bool has_reverse_cost,
+                          path_element_t **path, int *path_count, char **err_msg,
+                          int e_max_id);
 #ifdef __cplusplus
 }
 #endif

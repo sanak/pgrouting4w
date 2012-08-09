@@ -26,7 +26,7 @@ namespace boost
       on_discover_edge_num, on_finish_edge_num
     };
   }
-							    
+
   struct on_initialize_edge { enum { num = detail::on_initialize_edge_num }; };
   struct on_start_edge { enum { num = detail::on_start_edge_num }; };
   struct on_discover_edge { enum { num = detail::on_discover_edge_num }; };

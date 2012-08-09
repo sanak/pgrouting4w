@@ -1,23 +1,23 @@
 /*
- * A* Shortest path algorithm for PostgreSQL
- *
- * Copyright (c) 2006 Anton A. Patrushev, Orkney, Inc.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *
- */
+* A* Shortest path algorithm for PostgreSQL
+*
+* Copyright (c) 2006 Anton A. Patrushev, Orkney, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+*
+*/
 
 // Include C header first for windows build issue
 #include "astar.h"
@@ -42,7 +42,7 @@ struct EdgeA
   float8 cost;
   //float8 distance;
 };
-	
+
 struct VertexA
 {
   int id;
@@ -99,11 +99,11 @@ private:
 template <class G, class E>
 static void
 graph_add_edge(G &graph, int id, int source, int target, 
-	       float8 cost, float8 s_x, float8 s_y, float8 t_x, float8 t_y)
+               float8 cost, float8 s_x, float8 s_y, float8 t_x, float8 t_y)
 {
   E e;
   bool inserted;
-    
+
   if (cost < 0) // edges are not inserted in the graph if cost is negative
     return;
 
@@ -123,9 +123,9 @@ graph_add_edge(G &graph, int id, int source, int target,
 
 int 
 boost_astar(edge_astar_t *edges, unsigned int count, 
-	    int source_vertex_id, int target_vertex_id,
-	    bool directed, bool has_reverse_cost,
-	    path_element_t **path, int *path_count, char **err_msg)
+            int source_vertex_id, int target_vertex_id,
+            bool directed, bool has_reverse_cost,
+            path_element_t **path, int *path_count, char **err_msg)
 {
 
   // FIXME: use a template for the directedS parameters
@@ -136,63 +136,63 @@ boost_astar(edge_astar_t *edges, unsigned int count,
 
   // FIXME: compute this value
   const unsigned int num_nodes = ((directed && has_reverse_cost ? 2 : 1) * 
-				  count) + 100;
+    count) + 100;
 
   graph_t graph(num_nodes);
 
   property_map<graph_t, edge_weight_t>::type weightmap = get(edge_weight, 
-							     graph);
+    graph);
 
   for (std::size_t j = 0; j < count; ++j)
   {
 
+    graph_add_edge<graph_t, edge_descriptor>(graph, 
+      edges[j].id, edges[j].source, 
+      edges[j].target, edges[j].cost, 
+      edges[j].s_x, edges[j].s_y, 
+      edges[j].t_x, edges[j].t_y);
+
+    if (!directed || (directed && has_reverse_cost))
+    {
+      float8 cost;
+
+      if (has_reverse_cost)
+      {
+        cost = edges[j].reverse_cost;
+      }
+      else 
+      {
+        cost = edges[j].cost;
+      }
+
       graph_add_edge<graph_t, edge_descriptor>(graph, 
-					       edges[j].id, edges[j].source, 
-					       edges[j].target, edges[j].cost, 
-					       edges[j].s_x, edges[j].s_y, 
-					       edges[j].t_x, edges[j].t_y);
-
-      if (!directed || (directed && has_reverse_cost))
-        {
-	  float8 cost;
-
-	  if (has_reverse_cost)
-            {
-	      cost = edges[j].reverse_cost;
-            }
-	  else 
-            {
-	      cost = edges[j].cost;
-            }
-
-	  graph_add_edge<graph_t, edge_descriptor>(graph, 
-						   edges[j].id, 
-						   edges[j].target, 
-						   edges[j].source, 
-						   cost, 
-						   edges[j].s_x, 
-						   edges[j].s_y, 
-						   edges[j].t_x, 
-						   edges[j].t_y);
-        }
+        edges[j].id, 
+        edges[j].target, 
+        edges[j].source, 
+        cost, 
+        edges[j].s_x, 
+        edges[j].s_y, 
+        edges[j].t_x, 
+        edges[j].t_y);
     }
+  }
 
   std::vector<vertex_descriptor> predecessors(num_vertices(graph));
 
   vertex_descriptor source_vertex = vertex(source_vertex_id, graph);
 
   if (source_vertex < 0) 
-    {
-      *err_msg = (char *) "Source vertex not found";
-      return -1;
-    }
+  {
+    *err_msg = (char *) "Source vertex not found";
+    return -1;
+  }
 
   vertex_descriptor target_vertex = vertex(target_vertex_id, graph);
   if (target_vertex < 0)
-    {
-      *err_msg = (char *) "Target vertex not found";
-      return -1;
-    }
+  {
+    *err_msg = (char *) "Target vertex not found";
+    return -1;
+  }
 
   std::vector<float8> distances(num_vertices(graph));
 
@@ -200,11 +200,11 @@ boost_astar(edge_astar_t *edges, unsigned int count,
     // Call A* named parameter interface
     astar_search
       (graph, source_vertex,
-       astar_distance_heuristic<graph_t, float>(graph, target_vertex),
-       predecessor_map(&predecessors[0]).
-       weight_map(get(&EdgeA::cost, graph)).
-       distance_map(&distances[0]).
-       visitor(astar_goal_visitor<vertex_descriptor>(target_vertex)));
+      astar_distance_heuristic<graph_t, float>(graph, target_vertex),
+      predecessor_map(&predecessors[0]).
+      weight_map(get(&EdgeA::cost, graph)).
+      distance_map(&distances[0]).
+      visitor(astar_goal_visitor<vertex_descriptor>(target_vertex)));
 
   } 
   catch(astar_found_goal fg) {
@@ -212,65 +212,65 @@ boost_astar(edge_astar_t *edges, unsigned int count,
     vector<int> path_vect;
     int max = MAX_NODES;
     path_vect.push_back(target_vertex);
-  
-    while (target_vertex != source_vertex) 
-      {
-        if (target_vertex == predecessors[target_vertex]) 
-	  {
-            *err_msg = (char *) "No path found";
-            return 0;
-	    
-	  }
-        target_vertex = predecessors[target_vertex];
 
-        path_vect.push_back(target_vertex);
-        if (!max--) 
-	  {
-            *err_msg = (char *) "Overflow";
-            return -1;
-	  }
+    while (target_vertex != source_vertex) 
+    {
+      if (target_vertex == predecessors[target_vertex]) 
+      {
+        *err_msg = (char *) "No path found";
+        return 0;
+
       }
+      target_vertex = predecessors[target_vertex];
+
+      path_vect.push_back(target_vertex);
+      if (!max--) 
+      {
+        *err_msg = (char *) "Overflow";
+        return -1;
+      }
+    }
 
     *path = (path_element_t *) malloc(sizeof(path_element_t) * 
-				      (path_vect.size() + 1));
+      (path_vect.size() + 1));
     *path_count = path_vect.size();
 
     for(int i = path_vect.size() - 1, j = 0; i >= 0; i--, j++)
+    {
+      graph_traits < graph_t >::vertex_descriptor v_src;
+      graph_traits < graph_t >::vertex_descriptor v_targ;
+      graph_traits < graph_t >::edge_descriptor e;
+      graph_traits < graph_t >::out_edge_iterator out_i, out_end;
+
+      (*path)[j].vertex_id = path_vect.at(i);
+
+      (*path)[j].edge_id = -1;
+      (*path)[j].cost = distances[target_vertex];
+
+      if (i == 0) 
       {
-        graph_traits < graph_t >::vertex_descriptor v_src;
-        graph_traits < graph_t >::vertex_descriptor v_targ;
-        graph_traits < graph_t >::edge_descriptor e;
-        graph_traits < graph_t >::out_edge_iterator out_i, out_end;
-
-        (*path)[j].vertex_id = path_vect.at(i);
-
-        (*path)[j].edge_id = -1;
-        (*path)[j].cost = distances[target_vertex];
-        
-        if (i == 0) 
-	  {
-            continue;
-	  }
-
-        v_src = path_vect.at(i);
-        v_targ = path_vect.at(i - 1);
-
-        for (boost::tie(out_i, out_end) = out_edges(v_src, graph); 
-             out_i != out_end; ++out_i)
-	  {
-            graph_traits < graph_t >::vertex_descriptor v, targ;
-            e = *out_i;
-            v = source(e, graph);
-            targ = target(e, graph);
-                                                                
-            if (targ == v_targ)
-	      {
-                (*path)[j].edge_id = graph[*out_i].id;
-                (*path)[j].cost = graph[*out_i].cost;
-                break;
-	      }
-	  }
+        continue;
       }
+
+      v_src = path_vect.at(i);
+      v_targ = path_vect.at(i - 1);
+
+      for (boost::tie(out_i, out_end) = out_edges(v_src, graph); 
+        out_i != out_end; ++out_i)
+      {
+        graph_traits < graph_t >::vertex_descriptor v, targ;
+        e = *out_i;
+        v = source(e, graph);
+        targ = target(e, graph);
+
+        if (targ == v_targ)
+        {
+          (*path)[j].edge_id = graph[*out_i].id;
+          (*path)[j].cost = graph[*out_i].cost;
+          break;
+        }
+      }
+    }
 
     return EXIT_SUCCESS;
   }
