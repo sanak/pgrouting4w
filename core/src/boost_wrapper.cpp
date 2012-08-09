@@ -78,24 +78,27 @@ boost_dijkstra(edge_t *edges, unsigned int count, int start_vertex, int end_vert
 
   for (std::size_t j = 0; j < count; ++j)
   {
-    edge_descriptor e; bool inserted;
-    boost::tie(e, inserted) = add_edge(edges[j].source, edges[j].target, graph);
-
-    graph[e].cost = edges[j].cost;
-    graph[e].id = edges[j].id;
-
-    if (!directed || (directed && has_reverse_cost))
+    if (edges[j].cost >= 0.0)
     {
-      boost::tie(e, inserted) = add_edge(edges[j].target, edges[j].source, graph);
+      edge_descriptor e; bool inserted;
+      boost::tie(e, inserted) = add_edge(edges[j].source, edges[j].target, graph);
+
+      graph[e].cost = edges[j].cost;
       graph[e].id = edges[j].id;
 
-      if (has_reverse_cost)
+      if (!directed || (directed && has_reverse_cost && edges[j].reverse_cost >= 0.0))
       {
-        graph[e].cost = edges[j].reverse_cost;
-      }
-      else 
-      {
-        graph[e].cost = edges[j].cost;
+        boost::tie(e, inserted) = add_edge(edges[j].target, edges[j].source, graph);
+        graph[e].id = edges[j].id;
+
+        if (has_reverse_cost)
+        {
+          graph[e].cost = edges[j].reverse_cost;
+        }
+        else
+        {
+          graph[e].cost = edges[j].cost;
+        }
       }
     }
   }
