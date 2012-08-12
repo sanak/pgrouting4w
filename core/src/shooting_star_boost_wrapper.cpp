@@ -195,6 +195,7 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
   std::map< int, vector< std::pair<float, vector<int> > >, std::less<int> > adjacent_edges;
 
   std::map< int, int, std::less<int> > vertices;
+  std::map< int, int, std::less<int> > reverse_vertices;
 
   vector<int> rule;
 
@@ -211,6 +212,7 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
     if(vertices[src]==0)
     {
       vertices[src]=j+offset;
+      reverse_vertices[j+offset] = src;
     }
     edges_array[j].source=vertices[src];
 
@@ -218,6 +220,7 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
     {
       offset++;      
       vertices[trg]=j+offset;
+      reverse_vertices[j+offset] = trg;
     }
     edges_array[j].target=vertices[trg];
 
@@ -417,7 +420,7 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
 
       (*path)[j].edge_id = graph[e].id;
       (*path)[j].cost = graph[e].cost;
-      (*path)[j].vertex_id = source(e, graph);
+      (*path)[j].vertex_id = reverse_vertices[source(e, graph)];
     }
 
     return EXIT_SUCCESS;
