@@ -250,11 +250,10 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
 
         if (has_reverse_cost)
         {
-          cost = edges_array[j].cost;
-          reverse_cost = edges_array[j].reverse_cost;
+          cost = edges_array[j].reverse_cost;
 
           //If chosen source/target edge's cost is high, take the edge for opposite direction
-          if(cost > reverse_cost)
+          if(edges_array[j].cost > edges_array[j].reverse_cost)
           {
             if(edges_array[j].id == source_edge_id)
               source_edge_id += e_max_id;
