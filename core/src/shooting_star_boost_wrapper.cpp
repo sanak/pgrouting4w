@@ -188,6 +188,7 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
 
   int z;
   int src, trg, offset, rule_num;
+  int index;
 
   graph_t graph(num_nodes);
 
@@ -199,6 +200,7 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
 
   offset = 1;
   rule_num = 0;
+  index = 0;
 
   for (std::size_t j = 0; j < count; ++j)
   {
@@ -235,7 +237,7 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
 
     if((j < count-1 && edges_array[j].id != edges_array[j+1].id)||(j==count-1))
     {
-      graph_add_edge<graph_t, edge_descriptor>(graph, j,
+      graph_add_edge<graph_t, edge_descriptor>(graph, index++,
         edges_array[j].id, edges_array[j].source, 
         edges_array[j].target, edges_array[j].cost, 
         edges_array[j].s_x, edges_array[j].s_y, 
@@ -273,7 +275,7 @@ boost_shooting_star(edge_shooting_star_t *edges_array, unsigned int count,
         }
 
 
-        graph_add_edge<graph_t, edge_descriptor>(graph, j,
+        graph_add_edge<graph_t, edge_descriptor>(graph, index++,
           edges_array[j].id+e_max_id, edges_array[j].target, 
           edges_array[j].source, cost, 
           edges_array[j].s_x, edges_array[j].s_y, 
