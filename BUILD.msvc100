@@ -25,11 +25,11 @@ CGAL
 -------------------------------------------------------------
  Use latest version(3.9)
  
- >mkdir build\msvc100
- >cd build\msvc100
- >cmake -G"Visual Studio 10" -DCMAKE_INSTALL_PREFIX=c:\build\local\msvc100\x86 -DBoost_INCLUDE_DIR:PATH=c:\build\local\msvc100\x86\include\boost-1_49 -DBOOST_LIBRARYDIR=c:\build\local\msvc100\x86\lib ..\..\
+ >mkdir build\msvc100\x86
+ >cd build\msvc100\x86
+ >cmake -G"Visual Studio 10" -DCMAKE_INSTALL_PREFIX=c:\build\local\msvc100\x86 -DBoost_INCLUDE_DIR:PATH=c:\build\local\msvc100\x86\include\boost-1_49 -DBOOST_LIBRARYDIR=c:\build\local\msvc100\x86\lib ..\..\..\
  
- Open "build\msvc100\CGAL.sln" and build.
+ Open "build\msvc100\x86\CGAL.sln" and build with "Release|Win32".
 
 
 Gaul
@@ -40,6 +40,7 @@ Gaul
  Edit "util\gaul\gaul_config_win.h"
  #  define vsnprintf _vsnprintf
  -> //#  define vsnprintf _vsnprintf
+ Build with "Release|Win32"
  Copy "windows\Release\gaul-windows.lib" to "c:\build\local\msvc100\x86\lib"
  Copy "src\gaul.h" and "src\gaul" and "util\gaul" to "c:\build\local\msvc100\x86\include"
 
@@ -56,8 +57,8 @@ PostgreSQL
 pgRouting
 -------------------------------------------------------------
 
- >mkdir build\msvc100
- >cd build\msvc100
- >cmake -G"Visual Studio 10" -DPOSTGRESQL_INCLUDE_DIR:PATH="c:\PROGRA~2\PostgreSQL\9.1\include;c:\PROGRA~2\PostgreSQL\9.1\include\server;c:\PROGRA~2\PostgreSQL\9.1\include\server;c:\PROGRA~2\PostgreSQL\9.1\include\server\port;c:\PROGRA~2\PostgreSQL\9.1\include\server\port\win32;c:\PROGRA~2\PostgreSQL\9.1\include\server\port\win32_msvc" -DPOSTGRESQL_LIBRARIES:FILEPATH=c:\PROGRA~2\PostgreSQL\9.1\lib\postgres.lib -DPOSTGRESQL_EXECUTABLE:PATH=c:\PROGRA~2\PostgreSQL\9.1\bin -DBoost_INCLUDE_DIR:PATH=c:\build\local\msvc100\x86\include\boost-1_49 -DBOOST_THREAD_LIBRARIES:FILEPATH=c:\build\local\msvc100\x86\lib\libboost_thread-vc100-mt-1_49.lib -DGAUL_INCLUDE_DIR:PATH=c:\build\local\msvc100\x86\include -DGAUL_LIBRARIES:FILEPATH=c:\build\local\msvc100\x86\lib\gaul-windows.lib -DGAUL_UTIL_LIBRARIES:FILEPATH=c:\build\local\msvc100\x86\lib\gaul-windows.lib -DCGAL_INCLUDE_DIR:PATH=c:\build\local\msvc100\x86\include -DCGAL_LIBRARIES:FILEPATH=c:\build\local\msvc100\x86\lib\CGAL-vc100-mt.lib -DGMP_LIBRARIES:FILEPATH=c:\build\local\msvc100\x86\lib\CGAL-vc100-mt.lib -DWITH_TSP=ON -DWITH_DD=ON ..\..\
+ >mkdir build\msvc100\x86
+ >cd build\msvc100\x86
+ >cmake -G"Visual Studio 10" -DPOSTGRESQL_INCLUDE_DIR:PATH="c:\PROGRA~2\PostgreSQL\9.1\include;c:\PROGRA~2\PostgreSQL\9.1\include\server;c:\PROGRA~2\PostgreSQL\9.1\include\server;c:\PROGRA~2\PostgreSQL\9.1\include\server\port;c:\PROGRA~2\PostgreSQL\9.1\include\server\port\win32;c:\PROGRA~2\PostgreSQL\9.1\include\server\port\win32_msvc" -DPOSTGRESQL_LIBRARIES:FILEPATH=c:\PROGRA~2\PostgreSQL\9.1\lib\postgres.lib -DPOSTGRESQL_EXECUTABLE:PATH=c:\PROGRA~2\PostgreSQL\9.1\bin -DBoost_INCLUDE_DIR:PATH=c:\build\local\msvc100\x86\include\boost-1_49 -DBOOST_THREAD_LIBRARIES:FILEPATH=c:\build\local\msvc100\x86\lib\libboost_thread-vc100-mt-1_49.lib -DGAUL_INCLUDE_DIR:PATH=c:\build\local\msvc100\x86\include -DGAUL_LIBRARIES:FILEPATH=c:\build\local\msvc100\x86\lib\gaul-windows.lib -DGAUL_UTIL_LIBRARIES:FILEPATH=c:\build\local\msvc100\x86\lib\gaul-windows.lib -DCGAL_INCLUDE_DIR:PATH=c:\build\local\msvc100\x86\include -DCGAL_LIBRARIES:FILEPATH=c:\build\local\msvc100\x86\lib\CGAL-vc100-mt.lib -DGMP_LIBRARIES:FILEPATH=c:\build\local\msvc100\x86\lib\CGAL-vc100-mt.lib -DWITH_TSP=ON -DWITH_DD=ON ..\..\..\
 
- Open "build\msvc100\PGROUTING.sln" and build.
+ Open "build\msvc100\x86\PGROUTING.sln" and build with "Release|Win32".
