@@ -22,6 +22,6 @@
 -- Core function for TSP
 -----------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION tsp(sql text, ids varchar, source integer)
-        RETURNS SETOF path_result
-        AS '$libdir/librouting_tsp'
-        LANGUAGE 'C' IMMUTABLE STRICT;
+	RETURNS SETOF path_result
+	AS '$libdir/librouting_tsp'
+	LANGUAGE 'C' IMMUTABLE STRICT;

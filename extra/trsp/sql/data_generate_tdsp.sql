@@ -10,10 +10,10 @@ create table time_dep_costs
 
 DROP FUNCTION generate_time_dep_data();
 create function generate_time_dep_data() returns integer as $$
-declare 
+declare
 way ways%rowtype;
 BEGIN
-	
+
 	FOR way IN SELECT gid,class_id,length from ways
 	LOOP
 		IF way.class_id in (101,111,102) THEN
@@ -31,7 +31,7 @@ BEGIN
 			INSERT INTO time_dep_costs(edge_id,start_time,end_time,travel_time) values (way.gid, 21, 22, (1.10 * way.length));
 			INSERT INTO time_dep_costs(edge_id,start_time,end_time,travel_time) values (way.gid, 22, 24, (1 * way.length));
 		END IF;
-		
+
 		IF way.class_id in (106,108,109,110,100) THEN
 			INSERT INTO time_dep_costs(edge_id,start_time,end_time,travel_time) values (way.gid, 0, 6, (1 * way.length));
 			INSERT INTO time_dep_costs(edge_id,start_time,end_time,travel_time) values (way.gid, 6, 7, (1.05 * way.length));
@@ -48,7 +48,7 @@ BEGIN
 			INSERT INTO time_dep_costs(edge_id,start_time,end_time,travel_time) values (way.gid, 22, 24, (1 * way.length));
 		END
 		IF;
-		
+
 		IF way.class_id in (112,119,117,114,122,401) THEN
 			INSERT INTO time_dep_costs(edge_id,start_time,end_time,travel_time) values (way.gid, 0, 6, (1 * way.length));
 			INSERT INTO time_dep_costs(edge_id,start_time,end_time,travel_time) values (way.gid, 6, 7, (1 * way.length));
@@ -65,8 +65,8 @@ BEGIN
 			INSERT INTO time_dep_costs(edge_id,start_time,end_time,travel_time) values (way.gid, 22, 24, (1 * way.length));
 		END
 		IF;
-		
-	END 
+
+	END
 	LOOP;
 	RETURN 1;
 END;
@@ -74,5 +74,5 @@ $$ language plpgsql;
 
 
 
-update time_dep_costs set travel_time = 100000 where edge_id in (select gid from ways where class_id = 106) and start_time = 19; 
-update time_dep_costs set travel_time = 100000 where edge_id in (select gid from ways where class_id = 106) and start_time = 9; 
+update time_dep_costs set travel_time = 100000 where edge_id in (select gid from ways where class_id = 106) and start_time = 19;
+update time_dep_costs set travel_time = 100000 where edge_id in (select gid from ways where class_id = 106) and start_time = 9;
