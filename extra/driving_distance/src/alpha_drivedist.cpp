@@ -1,29 +1,29 @@
 /*
- * Alpha-Shapes for PostgreSQL
- *
- * Copyright (c) 2006 Anton A. Patrushev, Orkney, Inc.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *
- *
- * As a special exception, you have permission to link this program
- * with the CGAL library and distribute executables, as long as you
- * follow the requirements of the GNU GPL in regard to all of the
- * software in the executable aside from CGAL.
- *
- */
+* Alpha-Shapes for PostgreSQL
+*
+* Copyright (c) 2006 Anton A. Patrushev, Orkney, Inc.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+*
+*
+* As a special exception, you have permission to link this program
+* with the CGAL library and distribute executables, as long as you
+* follow the requirements of the GNU GPL in regard to all of the
+* software in the executable aside from CGAL.
+*
+*/
 
 
 /***********************************************************************
@@ -87,31 +87,31 @@ void find_next_edge(Segment s, std::vector<Segment>& segments,
 {
   if(res.size() == segments.size())
     return;
-    
+
   res.push_back(s);
 
   Point end = s.target();
-  
+
   for(int i=0;i < segments.size(); i++)
+  {
+    Point source = segments.at(i).source();
+    if(source == end)
     {
-      Point source = segments.at(i).source();
-      if(source == end)
-        {
-          find_next_edge(segments.at(i), segments, res);
-        }
+      find_next_edge(segments.at(i), segments, res);
     }
+  }
 }
 
 template <class OutputIterator>
 void
 alpha_edges( const Alpha_shape_2&  A,
-             OutputIterator out)
+            OutputIterator out)
 { 
 
   for(Alpha_shape_edges_iterator it =  A.alpha_shape_edges_begin();
-      it != A.alpha_shape_edges_end();
-      ++it){
-    *out++ = A.segment(*it);
+    it != A.alpha_shape_edges_end();
+    ++it){
+      *out++ = A.segment(*it);
   }
 }
 
@@ -122,18 +122,18 @@ int alpha_shape(vertex_t *vertices, unsigned int count,
   std::list<Point> points;
 
   //std::copy(begin(vertices), end(vertices), std::back_inserter(points)); 
-  
+
   for (std::size_t j = 0; j < count; ++j)
-    {
-      Point p(vertices[j].x, vertices[j].y);
-      points.push_back(p);
-    }
-  
+  {
+    Point p(vertices[j].x, vertices[j].y);
+    points.push_back(p);
+  }
+
 
   Alpha_shape_2 A(points.begin(), points.end(),
-                  coord_type(10000),
-                  Alpha_shape_2::GENERAL);
-  
+    coord_type(10000),
+    Alpha_shape_2::GENERAL);
+
   std::vector<Segment> segments;
   std::vector<Segment> result;
 
@@ -143,7 +143,7 @@ int alpha_shape(vertex_t *vertices, unsigned int count,
   Alpha_shape_2::Edge edge;
   Alpha_shape_2::Face_iterator fit;
   Alpha_shape_2::Face_handle face;
-  
+
   A.set_alpha(*A.find_optimal_alpha(1)*6); 
 
   alpha_edges( A, std::back_inserter(segments));
@@ -155,10 +155,10 @@ int alpha_shape(vertex_t *vertices, unsigned int count,
   *res_count = result.size();
 
   for(int i=0;i < result.size(); i++)
-    {
-      (*res)[i].x = result.at(i).target().x();
-      (*res)[i].y = result.at(i).target().y();
-    }
+  {
+    (*res)[i].x = result.at(i).target().x();
+    (*res)[i].y = result.at(i).target().y();
+  }
 
   return EXIT_SUCCESS;
 }
