@@ -37,7 +37,7 @@ CREATE OR REPLACE FUNCTION shortest_path(sql text, source_id integer,
 -- instead of Dijkstra's.
 -----------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION shortest_path_astar(sql text, source_id integer,
-	target_id integer,directed boolean, has_reverse_cost boolean)
+	target_id integer, directed boolean, has_reverse_cost boolean)
 	RETURNS SETOF path_result
 	AS '$libdir/librouting'
 	LANGUAGE 'C' IMMUTABLE STRICT;
@@ -47,7 +47,7 @@ CREATE OR REPLACE FUNCTION shortest_path_astar(sql text, source_id integer,
 -- Simillar to shortest_path in usage but uses the Shooting* algorithm
 -----------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION shortest_path_shooting_star(sql text, source_id integer,
-	target_id integer,directed boolean, has_reverse_cost boolean)
+	target_id integer, directed boolean, has_reverse_cost boolean)
 	RETURNS SETOF path_result
 	AS '$libdir/librouting'
 	LANGUAGE 'C' IMMUTABLE STRICT;

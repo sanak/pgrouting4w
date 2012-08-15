@@ -19,7 +19,7 @@ DECLARE
 
 BEGIN
 
-	FOR row IN EXECUTE 'select getsrid(the_geom) as srid from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
+	FOR row IN EXECUTE 'select ST_SRID(the_geom) as srid from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
 	END LOOP;
 	srid:= row.srid;
 
@@ -79,7 +79,7 @@ DECLARE
 
 BEGIN
 
-	FOR row IN EXECUTE 'select getsrid(the_geom) as srid from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
+	FOR row IN EXECUTE 'select ST_SRID(the_geom) as srid from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
 	END LOOP;
 	srid:= row.srid;
 
@@ -155,7 +155,7 @@ DECLARE
 	srid integer;
 BEGIN
 
-	FOR row IN EXECUTE 'select getsrid(the_geom) as srid from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
+	FOR row IN EXECUTE 'select ST_SRID(the_geom) as srid from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
 	END LOOP;
 	srid:= row.srid;
 
@@ -231,12 +231,12 @@ DECLARE
 
 BEGIN
 
-	FOR row IN EXECUTE 'select getsrid(the_geom) as srid from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
+	FOR row IN EXECUTE 'select ST_SRID(the_geom) as srid from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
 	END LOOP;
 	srid:= row.srid;
 
 
-	FOR row IN EXECUTE 'select geometryType(ST_GeometryFromText('''||astext(line)||''', '||srid||')) as type' LOOP
+	FOR row IN EXECUTE 'select ST_GeometryType(ST_GeometryFromText('''||astext(line)||''', '||srid||')) as type' LOOP
 	END LOOP;
 
 	IF row.type <> 'LINESTRING' THEN
@@ -279,7 +279,7 @@ BEGIN
 			-- We could find existing edge, so let's construct the main query now
 
 			query := 'select gid, the_geom FROM shortest_path( ''select gid as id, source::integer,'||
-				' target::integer, length::double precision as cost,x1,x2,y1,y2';
+				' target::integer, length::double precision as cost, x1, x2, y1, y2';
 
 			IF rc THEN query := query || ', reverse_cost';
 			END IF;
@@ -353,11 +353,11 @@ DECLARE
 
 BEGIN
 
-	FOR row IN EXECUTE 'select getsrid(the_geom) as srid from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
+	FOR row IN EXECUTE 'select ST_SRID(the_geom) as srid from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
 	END LOOP;
 	srid:= row.srid;
 
-	FOR row IN EXECUTE 'select geometryType(ST_GeometryFromText('''||astext(line)||''', '||srid||')) as type' LOOP
+	FOR row IN EXECUTE 'select ST_GeometryType(ST_GeometryFromText('''||astext(line)||''', '||srid||')) as type' LOOP
 	END LOOP;
 
 	IF row.type <> 'LINESTRING' THEN
@@ -406,7 +406,7 @@ BEGIN
 			-- We could find existing edge, so let's construct the main query now
 
 			query := 'select edge_id, vertex_id, cost FROM shortest_path( ''select gid as id, source::integer,'||
-				' target::integer, length::double precision as cost,x1,x2,y1,y2 ';
+				' target::integer, length::double precision as cost, x1, x2, y1, y2 ';
 
 			IF rc THEN query := query || ', reverse_cost';
 			END IF;
@@ -440,17 +440,17 @@ BEGIN
 
 						FOR t IN (prev+1)..z-1 LOOP
 
-							path.edge_id := edges[t];
+							path.edge_id   := edges[t];
 							path.vertex_id := vertices[t];
-							path.cost = costs[t];
+							path.cost      := costs[t];
 
-							edges[t] := edges[z-t+prev+1];
+							edges[t]    := edges[z-t+prev+1];
 							vertices[t] := vertices[z-t+prev+1];
-							costs[t] := costs[z-t+prev+1];
+							costs[t]    := costs[z-t+prev+1];
 
-							edges[z-t+prev+1] := path.edge_id;
+							edges[z-t+prev+1]    := path.edge_id;
 							vertices[z-t+prev+1] := path.vertex_id;
-							costs[z-t+prev+1] := path.cost;
+							costs[z-t+prev+1]    := path.cost;
 
 
 						END LOOP;
@@ -477,9 +477,9 @@ BEGIN
 	FOR t IN 0..array_upper(edges, 1) LOOP
 
 		IF edges[array_upper(edges, 1)-t] > 0 OR (edges[array_upper(edges, 1)-t] < 0 AND t = array_upper(edges, 1)) THEN
-			path.edge_id := edges[array_upper(edges, 1)-t];
+			path.edge_id   := edges[array_upper(edges, 1)-t];
 			path.vertex_id := vertices[array_upper(edges, 1)-t];
-			path.cost = costs[array_upper(edges, 1)-t];
+			path.cost      := costs[array_upper(edges, 1)-t];
 			RETURN NEXT path;
 		END IF;
 	END LOOP;
@@ -517,11 +517,11 @@ DECLARE
 
 BEGIN
 
-	FOR row IN EXECUTE 'select getsrid(the_geom) as srid from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
+	FOR row IN EXECUTE 'select ST_SRID(the_geom) as srid from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
 	END LOOP;
 	srid:= row.srid;
 
-	FOR row IN EXECUTE 'select geometryType(ST_GeometryFromText('''||astext(line)||''', '||srid||')) as type' LOOP
+	FOR row IN EXECUTE 'select ST_GeometryType(ST_GeometryFromText('''||astext(line)||''', '||srid||')) as type' LOOP
 	END LOOP;
 
 	IF row.type <> 'LINESTRING' THEN
