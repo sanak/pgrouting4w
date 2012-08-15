@@ -40,7 +40,7 @@ DECLARE
 BEGIN
 
 	BEGIN
-		EXECUTE 'SELECT addGeometryColumn(''' ||
+		EXECUTE 'SELECT AddGeometryColumn(''' ||
 			quote_ident(vertices_table)  ||
 			''', ''the_geom'', -1, ''POINT'', 2)';
 	EXCEPTION
@@ -51,12 +51,12 @@ BEGIN
 		' SET the_geom = NULL';
 
 	EXECUTE 'UPDATE ' || quote_ident(vertices_table) ||
-		' SET the_geom = startPoint(geometryn(m.the_geom, 1)) FROM ' ||
+		' SET the_geom = ST_StartPoint(ST_GeometryN(m.the_geom, 1)) FROM ' ||
 		quote_ident(geom_table) ||
 		' m where geom_id = m.source';
 
 	EXECUTE 'UPDATE ' || quote_ident(vertices_table) ||
-		' set the_geom = endPoint(geometryn(m.the_geom, 1)) FROM ' ||
+		' set the_geom = ST_EndPoint(ST_GeometryN(m.the_geom, 1)) FROM ' ||
 		quote_ident(geom_table) ||
 		' m where geom_id = m.target_id AND ' ||
 		quote_ident(vertices_table) ||
