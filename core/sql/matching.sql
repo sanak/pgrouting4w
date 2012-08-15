@@ -76,12 +76,21 @@ DECLARE
 	target integer;
 
 	srid integer;
+	geom_type varchar;
+	line text;
 
 BEGIN
 
-	FOR row IN EXECUTE 'select ST_SRID(the_geom) as srid from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
+	FOR row IN EXECUTE 'select ST_SRID(the_geom) as srid, ST_GeometryType(the_geom) as geom_type from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
 	END LOOP;
 	srid:= row.srid;
+	geom_type:=row.geom_type;
+
+	IF geom_type = 'ST_LineString' THEN
+		line:='the_geom';
+	ELSIF geom_type = 'ST_MultiLineString' THEN
+		line:='ST_GeometryN(the_geom, 1)';
+	END IF;
 
 	-- Getting x and y of the point
 
@@ -95,7 +104,7 @@ BEGIN
 
 	-- Getting nearest source
 
-	FOR row in EXECUTE 'select source, ST_Distance(ST_StartPoint(the_geom), ST_GeometryFromText('''||point||''', '||srid||')) as dist from '||tbl||
+	FOR row in EXECUTE 'select source, ST_Distance(ST_StartPoint('||line||'), ST_GeometryFromText('''||point||''', '||srid||')) as dist from '||tbl||
 		' where ST_SetSRID(''BOX3D('||x-distance||' '||y-distance||', '||x+distance||' '||y+distance||')''::BOX3D, '||srid||')&&the_geom order by dist asc limit 1'
 	LOOP
 	END LOOP;
@@ -105,7 +114,7 @@ BEGIN
 
 	-- Getting nearest target
 
-	FOR row in EXECUTE 'select target, ST_Distance(ST_EndPoint(the_geom), ST_GeometryFromText('''||point||''', '||srid||')) as dist from '||tbl||
+	FOR row in EXECUTE 'select target, ST_Distance(ST_EndPoint('||line||'), ST_GeometryFromText('''||point||''', '||srid||')) as dist from '||tbl||
 		' where ST_SetSRID(''BOX3D('||x-distance||' '||y-distance||', '||x+distance||' '||y+distance||')''::BOX3D, '||srid||')&&the_geom order by dist asc limit 1'
 	LOOP
 	END LOOP;
@@ -153,12 +162,20 @@ DECLARE
 	res link_point;
 
 	srid integer;
+	geom_type varchar;
+	line text;
 BEGIN
 
-	FOR row IN EXECUTE 'select ST_SRID(the_geom) as srid from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
+	FOR row IN EXECUTE 'select ST_SRID(the_geom) as srid, ST_GeometryType(the_geom) as geom_type from '||tbl||' where gid = (select min(gid) from '||tbl||')' LOOP
 	END LOOP;
-	srid:= row.srid;
+	srid := row.srid;
+	geom_type := row.geom_type;
 
+	IF geom_type = 'ST_LineString' THEN
+		line := 'the_geom';
+	ELSIF geom_type = 'ST_MultiLineString' THEN
+		line := 'ST_GeometryN(the_geom, 1)';
+	END IF;
 
 	-- Searching for a nearest link
 
@@ -166,19 +183,19 @@ BEGIN
 	LOOP
 	END LOOP;
 	IF row.id is null THEN
-		res.id = -1;
+		res.id := -1;
 		RETURN res;
 	END IF;
-	link:=row.id;
+	link := row.id;
 
 	-- Check what is nearer - source or target
 
-	FOR row in EXECUTE 'select ST_Distance((select ST_StartPoint(the_geom) from '||tbl||' where gid='||link||'), ST_GeometryFromText('''||point||''', '||srid||')) as dist'
+	FOR row in EXECUTE 'select ST_Distance((select ST_StartPoint('||line||') from '||tbl||' where gid='||link||'), ST_GeometryFromText('''||point||''', '||srid||')) as dist'
 	LOOP
 	END LOOP;
 	d1:=row.dist;
 
-	FOR row in EXECUTE 'select ST_Distance((select ST_EndPoint(the_geom) from '||tbl||' where gid='||link||'), ST_GeometryFromText('''||point||''', '||srid||')) as dist'
+	FOR row in EXECUTE 'select ST_Distance((select ST_EndPoint('||line||') from '||tbl||' where gid='||link||'), ST_GeometryFromText('''||point||''', '||srid||')) as dist'
 	LOOP
 	END LOOP;
 	d2:=row.dist;
@@ -254,7 +271,7 @@ BEGIN
 			-- Getting nearest node to the current point
 
 		FOR row in EXECUTE 'select * from find_nearest_node_within_distance(''POINT('
-			||ST_X(ST_PointN(line, i))||' '||ST_Y(PointN(line, i))||')'','||distance||', '''||tbl||''') as id'
+			||ST_X(ST_PointN(line, i))||' '||ST_Y(ST_PointN(line, i))||')'','||distance||', '''||tbl||''') as id'
 		LOOP
 		END LOOP;
 
@@ -266,7 +283,7 @@ BEGIN
 			-- If there is no nearest node within given distance, let's try another algorithm
 
 			FOR row in EXECUTE 'select * from find_node_by_nearest_link_within_distance(''POINT('
-				||ST_X(ST_PointN(line, i))||' '||ST_Y(PointN(line, i))||')'','||distance2||', '''||tbl||''') as id'
+				||ST_X(ST_PointN(line, i))||' '||ST_Y(ST_PointN(line, i))||')'','||distance2||', '''||tbl||''') as id'
 			LOOP
 			END LOOP;
 

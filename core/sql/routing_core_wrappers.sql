@@ -275,6 +275,8 @@ DECLARE
 	geom geoms;
 
 	srid integer;
+	geom_type varchar;
+	line text;
 
 	source_x float8;
 	source_y float8;
@@ -293,14 +295,22 @@ BEGIN
 
 	id :=0;
 	FOR rec IN EXECUTE
-		'select ST_SRID(the_geom) from ' ||
+		'select ST_SRID(the_geom) as srid, ' ||
+		'ST_GeometryType(the_geom) as geom_type from ' ||
 		quote_ident(geom_table) || ' limit 1'
 	LOOP
 	END LOOP;
 	srid := rec.srid;
+	geom_type := rec.geom_type;
+
+	IF geom_type = 'ST_LineString' THEN
+		line := 'the_geom';
+	ELSIF geom_type = 'ST_MultiLineString' THEN
+		line := 'ST_GeometryN(the_geom, 1)';
+	END IF;
 
 	FOR rec IN EXECUTE
-		'select ST_X(ST_StartPoint(the_geom)) as source_x from ' ||
+		'select ST_X(ST_StartPoint(' || line || ')) as source_x from ' ||
 		quote_ident(geom_table) || ' where source = ' ||
 		sourceid ||  ' or target='||sourceid||' limit 1'
 	LOOP
@@ -308,7 +318,7 @@ BEGIN
 	source_x := rec.source_x;
 
 	FOR rec IN EXECUTE
-		'select ST_Y(ST_StartPoint(the_geom)) as source_y from ' ||
+		'select ST_Y(ST_StartPoint(' || line || ')) as source_y from ' ||
 		quote_ident(geom_table) || ' where source = ' ||
 		sourceid ||  ' or target='||sourceid||' limit 1'
 	LOOP
@@ -317,7 +327,7 @@ BEGIN
 	source_y := rec.source_y;
 
 	FOR rec IN EXECUTE
-		'select ST_X(ST_StartPoint(the_geom)) as target_x from ' ||
+		'select ST_X(ST_StartPoint(' || line || ')) as target_x from ' ||
 		quote_ident(geom_table) || ' where source = ' ||
 		targetid ||  ' or target='||targetid||' limit 1'
 	LOOP
@@ -326,7 +336,7 @@ BEGIN
 	target_x := rec.target_x;
 
 	FOR rec IN EXECUTE
-		'select ST_Y(ST_StartPoint(the_geom)) as target_y from ' ||
+		'select ST_Y(ST_StartPoint(' || line || ')) as target_y from ' ||
 		quote_ident(geom_table) || ' where source = ' ||
 		targetid ||  ' or target='||targetid||' limit 1'
 	LOOP
@@ -378,17 +388,6 @@ BEGIN
 		geom.id       := id;
 
 		RETURN NEXT geom;
---
---                v_id = path_result.vertex_id;
---                e_id = path_result.edge_id;
-
---                FOR r IN EXECUTE 'SELECT gid, the_geom FROM ' ||
---                      quote_ident(geom_table) || '  WHERE gid = ' ||
---                      quote_literal(e_id) LOOP
---                        geom.gid := r.gid;
---                        geom.the_geom := r.the_geom;
---                        RETURN NEXT geom;
---                END LOOP;
 
 	END LOOP;
 	RETURN;
@@ -478,6 +477,8 @@ DECLARE
 	geom geoms;
 
 	srid integer;
+	geom_type varchar;
+	line text;
 
 	source_x float8;
 	source_y float8;
@@ -496,14 +497,22 @@ BEGIN
 
 	id :=0;
 	FOR rec IN EXECUTE
-		'select ST_SRID(the_geom) from ' ||
+		'select ST_SRID(the_geom) as srid, ' ||
+		'ST_GeometryType(the_geom) as geom_type from ' ||
 		quote_ident(geom_table) || ' limit 1'
 	LOOP
 	END LOOP;
 	srid := rec.srid;
+	geom_type := rec.geom_type;
+
+	IF geom_type = 'ST_LineString' THEN
+		line := 'the_geom';
+	ELSIF geom_type = 'ST_MultiLineString' THEN
+		line := 'ST_GeometryN(the_geom, 1)';
+	END IF;
 
 	FOR rec IN EXECUTE
-		'select ST_X(ST_StartPoint(the_geom)) as source_x from ' ||
+		'select ST_X(ST_StartPoint(' || line || ')) as source_x from ' ||
 		quote_ident(geom_table) || ' where source = ' ||
 		sourceid || ' or target='||sourceid||' limit 1'
 	LOOP
@@ -511,7 +520,7 @@ BEGIN
 	source_x := rec.source_x;
 
 	FOR rec IN EXECUTE
-		'select ST_Y(ST_StartPoint(the_geom)) as source_y from ' ||
+		'select ST_Y(ST_StartPoint(' || line || ')) as source_y from ' ||
 		quote_ident(geom_table) || ' where source = ' ||
 		sourceid ||  ' or target='||sourceid||' limit 1'
 	LOOP
@@ -520,7 +529,7 @@ BEGIN
 	source_y := rec.source_y;
 
 	FOR rec IN EXECUTE
-		'select ST_X(ST_StartPoint(the_geom)) as target_x from ' ||
+		'select ST_X(ST_StartPoint(' || line || ')) as target_x from ' ||
 		quote_ident(geom_table) || ' where source = ' ||
 		targetid ||  ' or target='||targetid||' limit 1'
 	LOOP
@@ -529,7 +538,7 @@ BEGIN
 	target_x := rec.target_x;
 
 	FOR rec IN EXECUTE
-		'select ST_Y(ST_StartPoint(the_geom)) as target_y from ' ||
+		'select ST_Y(ST_StartPoint(' || line || ')) as target_y from ' ||
 		quote_ident(geom_table) || ' where source = ' ||
 		targetid ||  ' or target='||targetid||' limit 1'
 	LOOP
@@ -666,6 +675,8 @@ DECLARE
 	geom geoms;
 
 	srid integer;
+	geom_type varchar;
+	line text;
 
 	source_x float8;
 	source_y float8;
@@ -683,14 +694,22 @@ BEGIN
 
 	id :=0;
 	FOR rec IN EXECUTE
-		'select ST_SRID(the_geom) from ' ||
+		'select ST_SRID(the_geom) as srid, ' ||
+		'ST_GeometryType(the_geom) as geom_type from ' ||
 		quote_ident(geom_table) || ' limit 1'
 	LOOP
 	END LOOP;
 	srid := rec.srid;
+	geom_type := rec.geom_type;
+
+	IF geom_type = 'ST_LineString' THEN
+		line := 'the_geom';
+	ELSIF geom_type = 'ST_MultiLineString' THEN
+		line := 'ST_GeometryN(the_geom, 1)';
+	END IF;
 
 	FOR rec IN EXECUTE
-		'select ST_X(ST_StartPoint(the_geom)) as source_x from ' ||
+		'select ST_X(ST_StartPoint(' || line || ')) as source_x from ' ||
 		quote_ident(geom_table) || ' where source = ' ||
 		sourceid ||  ' or target='||sourceid||' limit 1'
 	LOOP
@@ -698,7 +717,7 @@ BEGIN
 	source_x := rec.source_x;
 
 	FOR rec IN EXECUTE
-		'select ST_Y(ST_StartPoint(the_geom)) as source_y from ' ||
+		'select ST_Y(ST_StartPoint(' || line || ')) as source_y from ' ||
 		quote_ident(geom_table) || ' where source = ' ||
 		sourceid ||  ' or target='||sourceid||' limit 1'
 	LOOP
@@ -707,7 +726,7 @@ BEGIN
 	source_y := rec.source_y;
 
 	FOR rec IN EXECUTE
-		'select ST_X(ST_StartPoint(the_geom)) as target_x from ' ||
+		'select ST_X(ST_StartPoint(' || line || ')) as target_x from ' ||
 		quote_ident(geom_table) || ' where source = ' ||
 		targetid ||  ' or target='||targetid||' limit 1'
 	LOOP
@@ -716,7 +735,7 @@ BEGIN
 	target_x := rec.target_x;
 
 	FOR rec IN EXECUTE
-		'select ST_Y(ST_StartPoint(the_geom)) as target_y from ' ||
+		'select ST_Y(ST_StartPoint(' || line || ')) as target_y from ' ||
 		quote_ident(geom_table) || ' where source = ' ||
 		targetid ||  ' or target='||targetid||' limit 1'
 	LOOP
@@ -870,7 +889,7 @@ BEGIN
 
 	id :=0;
 	FOR rec IN EXECUTE
-		'select srid(the_geom) from ' ||
+		'select ST_SRID(the_geom) as srid from ' ||
 		quote_ident(geom_table) || ' limit 1'
 	LOOP
 	END LOOP;
@@ -1025,6 +1044,8 @@ DECLARE
 	geom geoms;
 
 	srid integer;
+	geom_type varchar;
+	line text;
 
 	source_x float8;
 	source_y float8;
@@ -1043,21 +1064,29 @@ BEGIN
 
 	id :=0;
 	FOR rec IN EXECUTE
-		'select srid(the_geom) from ' ||
+		'select ST_SRID(the_geom) as srid, ' ||
+		'ST_GeometryType(the_geom) as geom_type from ' ||
 		quote_ident(geom_table) || ' limit 1'
 	LOOP
 	END LOOP;
 	srid := rec.srid;
+	geom_type := rec.geom_type;
+
+	IF geom_type = 'ST_LineString' THEN
+		line := 'the_geom';
+	ELSIF geom_type = 'ST_MultiLineString' THEN
+		line := 'ST_GeometryN(the_geom, 1)';
+	END IF;
 
 	FOR rec IN EXECUTE
-		'select x(startpoint(the_geom)) as source_x from ' ||
+		'select ST_X(ST_StartPoint(' || line || ')) as source_x from ' ||
 		quote_ident(geom_table) || ' where gid = '||sourceid
 	LOOP
 	END LOOP;
 	source_x := rec.source_x;
 
 	FOR rec IN EXECUTE
-		'select y(startpoint(the_geom)) as source_y from ' ||
+		'select ST_Y(ST_StartPoint(' || line || ')) as source_y from ' ||
 		quote_ident(geom_table) || ' where gid = ' ||sourceid
 	LOOP
 	END LOOP;
@@ -1065,7 +1094,7 @@ BEGIN
 	source_y := rec.source_y;
 
 	FOR rec IN EXECUTE
-		'select x(startpoint(the_geom)) as target_x from ' ||
+		'select ST_X(ST_StartPoint(' || line || ')) as target_x from ' ||
 		quote_ident(geom_table) || ' where gid = ' ||targetid
 	LOOP
 	END LOOP;
@@ -1073,7 +1102,7 @@ BEGIN
 	target_x := rec.target_x;
 
 	FOR rec IN EXECUTE
-		'select y(startpoint(the_geom)) as target_y from ' ||
+		'select ST_Y(ST_StartPoint(' || line || ')) as target_y from ' ||
 		quote_ident(geom_table) || ' where gid = ' ||targetid
 	LOOP
 	END LOOP;
@@ -1110,7 +1139,7 @@ BEGIN
 	IF rc THEN query := query || ' , reverse_cost ';
 	END IF;
 
-	query := query || 'FROM ' || quote_ident(geom_table) || ' where setSRID(''''BOX3D('||
+	query := query || 'FROM ' || quote_ident(geom_table) || ' where ST_SetSRID(''''BOX3D('||
 		ll_x-delta||' '||ll_y-delta||','||ur_x+delta||' '||
 		ur_y+delta||')''''::BOX3D, ' || srid || ') && the_geom'', ' ||
 		quote_literal(sourceid) || ' , ' ||

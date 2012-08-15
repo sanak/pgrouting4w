@@ -61,6 +61,8 @@ DECLARE
 	source_id int;
 	target_id int;
 	srid integer;
+	geom_type varchar;
+	line text;
 BEGIN
 
 	BEGIN
@@ -72,14 +74,24 @@ BEGIN
 	EXECUTE 'CREATE TABLE vertices_tmp (id serial)';
 
 	srid := Find_SRID('public', quote_ident(geom_table), quote_ident(geo_cname));
+	FOR _r IN EXECUTE 'SELECT ST_GeometryType(' || quote_ident(geo_cname) || ') AS geom_type'
+		|| ' FROM ' || quote_ident(geom_table) || ' LIMIT 1'
+	LOOP
+	END LOOP;
+	geom_type := _r.geom_type;
+	
+	IF geom_type = 'ST_LineString' THEN
+		line := quote_ident(geo_cname);
+	ELSIF geom_type = 'ST_MultiLineString' THEN
+		line := 'ST_GeometryN(' || quote_ident(geo_cname) || ', 1)';
+	END IF;
 
-
-	EXECUTE 'SELECT addGeometryColumn(''vertices_tmp'', ''the_geom'', '||srid||', ''POINT'', 2)';
+	EXECUTE 'SELECT AddGeometryColumn(''vertices_tmp'', ''the_geom'', ' || srid || ', ''POINT'', 2)';
 	CREATE INDEX vertices_tmp_idx ON vertices_tmp USING GIST (the_geom);
 
 	FOR _r IN EXECUTE 'SELECT ' || quote_ident(gid_cname) || ' AS id,'
-		|| ' ST_StartPoint('|| quote_ident(geo_cname) ||') AS source,'
-		|| ' ST_EndPoint('|| quote_ident(geo_cname) ||') as target'
+		|| ' ST_StartPoint('|| line ||') AS source,'
+		|| ' ST_EndPoint('|| line ||') AS target'
 		|| ' FROM ' || quote_ident(geom_table) || ' WHERE ' || quote_ident(geo_cname) || ' IS NOT NULL '
 	LOOP
 

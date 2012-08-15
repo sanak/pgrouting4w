@@ -34,11 +34,26 @@ DECLARE
 	v_id integer;
 	prev integer;
 
+	geom_type varchar;
+	line text;
 BEGIN
+	FOR r IN EXECUTE
+		'select ST_GeometryType(the_geom) as geom_type from ' ||
+		quote_ident(geom_table) || ' limit 1'
+	LOOP
+	END LOOP;
+	geom_type := r.geom_type;
+
+	IF geom_type = 'ST_LineString' THEN
+		line := 'the_geom';
+	ELSIF geom_type = 'ST_MultiLineString' THEN
+		line := 'ST_GeometryN(the_geom, 1)';
+	END IF;
+
 	prev := -1;
-	FOR path_result IN EXECUTE 'SELECT vertex_id FROM tsp(''select distinct source::integer as source_id, ST_X(ST_StartPoint(the_geom)), ST_Y(ST_StartPoint(the_geom)) from ' ||
+	FOR path_result IN EXECUTE 'SELECT vertex_id FROM tsp(''select distinct source::integer as source_id, ST_X(ST_StartPoint(' || line || ')), ST_Y(ST_StartPoint(' || line || ')) from ' ||
 		quote_ident(geom_table) || ' where source in (' ||
-		ids || ')  UNION select distinct target as source_id, ST_X(ST_EndPoint(the_geom)), ST_Y(ST_EndPoint(the_geom)) from tsp_test where target in ('||ids||')'', '''|| ids  ||''', '|| source  ||')' LOOP
+		ids || ')  UNION select distinct target as source_id, ST_X(ST_EndPoint(' || line || ')), ST_Y(ST_EndPoint(' || line || ')) from tsp_test where target in (' || ids || ')'', ''' || ids || ''', ' || source || ')' LOOP
 
 		v_id = path_result.vertex_id;
 		RETURN NEXT v_id;
@@ -68,19 +83,33 @@ DECLARE
 	geom geoms;
 
 	id integer;
+	geom_type varchar;
+	line text;
 BEGIN
+	FOR r IN EXECUTE
+		'select ST_GeometryType(the_geom) as geom_type from ' ||
+		quote_ident(geom_table) || ' limit 1'
+	LOOP
+	END LOOP;
+	geom_type := r.geom_type;
+
+	IF geom_type = 'ST_LineString' THEN
+		line := 'the_geom';
+	ELSIF geom_type = 'ST_MultiLineString' THEN
+		line := 'ST_GeometryN(the_geom, 1)';
+	END IF;
 
 	id :=0;
 	prev := source;
 	FOR path_result IN EXECUTE 'SELECT vertex_id FROM tsp(''select distinct source::integer as source_id, x1::double precision as x, y1::double precision as y from ' ||
 		quote_ident(geom_table) || ' where source in (' ||
-		ids || ') UNION select distinct target as source_id, ST_X(ST_EndPoint(the_geom)), ST_Y(ST_EndPoint(the_geom)) from tsp_test where target in ('||ids||')'', '''|| ids  ||''', '|| source  ||')' LOOP
+		ids || ') UNION select distinct target as source_id, ST_X(ST_EndPoint(' || line || ')), ST_Y(ST_EndPoint(' || line || ')) from tsp_test where target in (' || ids || ')'', ''' || ids || ''', ' || source || ')' LOOP
 
 		v_id = path_result.vertex_id;
 
 		FOR r IN EXECUTE 'SELECT gid, the_geom FROM astar_sp_delta( ''' ||
-			quote_ident(geom_table)  ||''', '|| v_id ||', '||
-			prev ||','||delta||')' LOOP
+			quote_ident(geom_table) || ''', ' || v_id || ', ' ||
+			prev || ',' || delta || ')' LOOP
 			geom.gid      := r.gid;
 			geom.the_geom := r.the_geom;
 			id            := id+1;
@@ -132,7 +161,7 @@ BEGIN
 	IF rc THEN query := query || ' , reverse_cost ';
 	END IF;
 
-	query := query || 'from tsp_test where target in ('||ids||')'', '''|| ids  ||''', '|| source  ||')';
+	query := query || 'from tsp_test where target in (' || ids || ')'', ''' || ids || ''', ' || source || ')';
 
 	FOR path_result IN EXECUTE query
 	LOOP
@@ -140,8 +169,8 @@ BEGIN
 		v_id = path_result.vertex_id;
 
 		FOR r IN EXECUTE 'SELECT gid, the_geom FROM astar_sp_delta_directed( ''' ||
-			quote_ident(geom_table)  ||''', '|| v_id ||', '||
-			prev ||','||delta||', '''||text(dir)||''', '''||text(rc)||''')' LOOP
+			quote_ident(geom_table) || ''', ' || v_id || ', ' ||
+			prev || ',' || delta || ', ''' || text(dir) || ''', ''' || text(rc) || ''')' LOOP
 			geom.gid      := r.gid;
 			geom.the_geom := r.the_geom;
 			id            := id+1;
@@ -173,20 +202,35 @@ DECLARE
 	geom geoms;
 
 	id integer;
+	geom_type varchar;
+	line text;
 BEGIN
+
+	FOR r IN EXECUTE
+		'select ST_GeometryType(the_geom) as geom_type from ' ||
+		quote_ident(geom_table) || ' limit 1'
+	LOOP
+	END LOOP;
+	geom_type := r.geom_type;
+
+	IF geom_type = 'ST_LineString' THEN
+		line := 'the_geom';
+	ELSIF geom_type = 'ST_MultiLineString' THEN
+		line := 'ST_GeometryN(the_geom, 1)';
+	END IF;
 
 	id :=0;
 	prev := source;
-	FOR path_result IN EXECUTE 'SELECT vertex_id FROM tsp(''select distinct source::integer as source_id, ST_X(ST_StartPoint(the_geom)), ST_Y(ST_StartPoint(the_geom)) from ' ||
+	FOR path_result IN EXECUTE 'SELECT vertex_id FROM tsp(''select distinct source::integer as source_id, ST_X(ST_StartPoint(' || line || ')), ST_Y(ST_StartPoint(' || line || ')) from ' ||
 		quote_ident(geom_table) || ' where source in (' ||
-		ids || ') UNION select distinct target as source_id, ST_X(ST_EndPoint(the_geom)), ST_Y(ST_EndPoint(the_geom)) from tsp_test where target in ('||ids||')'', '''|| ids  ||''', '|| source  ||')' LOOP
+		ids || ') UNION select distinct target as source_id, ST_X(ST_EndPoint(' || line || ')), ST_Y(ST_EndPoint(' || line || ')) from tsp_test where target in (' || ids || ')'', ''' || ids || ''', ' || source || ')' LOOP
 
 		v_id = path_result.vertex_id;
 
 
 		FOR r IN EXECUTE 'SELECT gid, the_geom FROM dijkstra_sp_delta( ''' ||
-			quote_ident(geom_table)  ||''', '|| v_id ||', '||
-			prev ||',0.03)' LOOP
+			quote_ident(geom_table) || ''', ' || v_id || ', ' ||
+			prev || ',0.03)' LOOP
 			geom.gid      := r.gid;
 			geom.the_geom := r.the_geom;
 			id            := id+1;
@@ -222,24 +266,39 @@ DECLARE
 	query text;
 
 	id integer;
+	geom_type varchar;
+	line text;
 BEGIN
+
+	FOR r IN EXECUTE
+		'select ST_GeometryType(the_geom) as geom_type from ' ||
+		quote_ident(geom_table) || ' limit 1'
+	LOOP
+	END LOOP;
+	geom_type := r.geom_type;
+
+	IF geom_type = 'ST_LineString' THEN
+		line := 'the_geom';
+	ELSIF geom_type = 'ST_MultiLineString' THEN
+		line := 'ST_GeometryN(the_geom, 1)';
+	END IF;
 
 	id :=0;
 	prev := source;
 
 	query := 'SELECT vertex_id FROM tsp(''select distinct source::integer as source_id, '||
-		'ST_X(ST_StartPoint(the_geom)), ST_Y(ST_StartPoint(the_geom))';
+		'ST_X(ST_StartPoint(' || line || ')), ST_Y(ST_StartPoint(' || line || '))';
 
 	IF rc THEN query := query || ' , reverse_cost ';
 	END IF;
 
 	query := query || ' from ' || quote_ident(geom_table) || ' where source in (' ||
-		ids || ') UNION select distinct target as source_id, ST_X(ST_EndPoint(the_geom)), ST_Y(ST_EndPoint(the_geom))';
+		ids || ') UNION select distinct target as source_id, ST_X(ST_EndPoint(' || line || ')), ST_Y(ST_EndPoint(' || line || '))';
 
 	IF rc THEN query := query || ' , reverse_cost ';
 	END IF;
 
-	query := query || 'from tsp_test where target in ('||ids||')'', '''|| ids  ||''', '|| source  ||')';
+	query := query || 'from tsp_test where target in (' || ids || ')'', ''' || ids || ''', ' || source || ')';
 
 	FOR path_result IN EXECUTE query
 	LOOP
@@ -248,8 +307,8 @@ BEGIN
 
 
 		FOR r IN EXECUTE 'SELECT gid, the_geom FROM dijkstra_sp_delta_directed( ''' ||
-			quote_ident(geom_table)  ||''', '|| v_id ||', '||
-			prev ||','||delta||', '''||text(dir)||''', '''||text(rc)||''')' LOOP
+			quote_ident(geom_table) || ''', ' || v_id || ', ' ||
+			prev || ',' || delta || ', ''' || text(dir) || ''', ''' || text(rc) || ''')' LOOP
 			geom.gid      := r.gid;
 			geom.the_geom := r.the_geom;
 			id            := id+1;
