@@ -15,7 +15,7 @@ PGDLLEXPORT Datum turn_restrict_shortest_path_edge(PG_FUNCTION_ARGS);
 #endif // _MSC_VER
 
 #undef DEBUG
-#define DEBUG 1
+//#define DEBUG 1
 
 #ifndef _MSC_VER
 #ifdef DEBUG
