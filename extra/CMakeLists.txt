@@ -1,1 +1,1 @@
-SUBDIRS(tsp driving_distance trsp)
+SUBDIRS(tsp driving_distance trsp darp)
