@@ -63,7 +63,7 @@ endif(PGROUTING_CORE_INCLUDE_DIR)
 
 OPTION(WITH_TSP "Build TSP library" OFF)
 OPTION(WITH_DD "Build Driving distance library" OFF)
-OPTION(WITH_DARP "Build Driving distance library" OFF)
+OPTION(WITH_DARP "Build Dial-a-ride Problem Solver(DARP) library" OFF)
 
 IF(UNIX)
   SET(LIBRARY_INSTALL_PATH ${LIB_DIR})
@@ -74,7 +74,7 @@ ELSE(UNIX)
   SET(SQL_INSTALL_PATH ${PGROUTING_BINARY_DIR}/lib)
 ENDIF(UNIX)
 
-SET(PGROUTING_INCLUDE_DIRECTORIES ${PGROUTING_SOURCE_DIR}/core ${PGROUTING_SOURCE_DIR}/core/src ${PGROUTING_SOURCE_DIR}/extra ${PGROUTING_SOURCE_DIR}/extra/darp ${PGROUTING_SOURCE_DIR}/extra/darp/src ${PGROUTING_SOURCE_DIR}/extra/tsp ${PGROUTING_SOURCE_DIR}/extra/tsp/src ${PGROUTING_SOURCE_DIR}/extra/driving_distance ${PGROUTING_SOURCE_DIR}/extra/driving_distance/src ${PGROUTING_SOURCE_DIR}/extra/trsp/src
+SET(PGROUTING_INCLUDE_DIRECTORIES ${PGROUTING_SOURCE_DIR}/core ${PGROUTING_SOURCE_DIR}/core/src ${PGROUTING_SOURCE_DIR}/extra ${PGROUTING_SOURCE_DIR}/extra/tsp ${PGROUTING_SOURCE_DIR}/extra/tsp/src ${PGROUTING_SOURCE_DIR}/extra/driving_distance ${PGROUTING_SOURCE_DIR}/extra/driving_distance/src ${PGROUTING_SOURCE_DIR}/extra/darp ${PGROUTING_SOURCE_DIR}/extra/darp/src ${PGROUTING_SOURCE_DIR}/extra/trsp ${PGROUTING_SOURCE_DIR}/extra/trsp/src
 )
 
 INCLUDE_DIRECTORIES(. ${PGROUTING_INCLUDE_DIRECTORIES} ${POSTGRESQL_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
@@ -88,8 +88,10 @@ IF(WIN32)
   LINK_LIBRARIES(postgres)
 ENDIF(WIN32)
 
-SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -O2 -g -frounding-math")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -frounding-math")
+IF(NOT MSVC)
+  SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -O2 -g -frounding-math")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -frounding-math")
+ENDIF(NOT MSVC)
 
 # Recurse into the subdirectories.  This does not actually
 # cause another cmake executable to run.  The same process will walk through
@@ -105,15 +107,6 @@ IF(WITH_TSP)
   ADD_SUBDIRECTORY(extra/tsp)
 ENDIF(WITH_TSP)
 
-IF(WITH_DARP)
-  macro_optional_find_package(GAUL)
-  IF(NOT GAUL_FOUND)
-    message(FATAL ERROR " Please check your gaul installation, or set correct path to GAUL_INCLUDE_DIR and GAUL_LIBRARIES.")
-  ENDIF(NOT GAUL_FOUND)
-  INCLUDE_DIRECTORIES(${INCLUDE_DIRECTORIES} ${GAUL_INCLUDE_DIR})
-  ADD_SUBDIRECTORY(extra/darp)
-ENDIF(WITH_DARP)
-
 IF(WITH_DD)
   macro_optional_find_package(CGAL)
   IF(NOT CGAL_FOUND)
@@ -123,8 +116,17 @@ IF(WITH_DD)
   ADD_SUBDIRECTORY(extra/driving_distance)
 ENDIF(WITH_DD)
 
-#ADD_SUBDIRECTORY(extra/trsp)
-SUBDIRS(extra/trsp)
+IF(WITH_DARP)
+  macro_optional_find_package(GAUL)
+  IF(NOT GAUL_FOUND)
+    message(FATAL ERROR " Please check your gaul installation, or set correct path to GAUL_INCLUDE_DIR and GAUL_LIBRARIES.")
+  ENDIF(NOT GAUL_FOUND)
+  INCLUDE_DIRECTORIES(${INCLUDE_DIRECTORIES} ${GAUL_INCLUDE_DIR})
+  ADD_SUBDIRECTORY(extra/darp)
+ENDIF(WITH_DARP)
 
-
+IF(WITH_TRSP)
+  ADD_SUBDIRECTORY(extra/trsp)
+  #SUBDIRS(extra/trsp)
+ENDIF(WITH_TRSP)
 

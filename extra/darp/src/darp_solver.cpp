@@ -18,15 +18,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  */
-                   
+
+#include "darp.h"
+#include <vector>
+
 extern "C"
 {
 #include <gaul.h>
-#include <postgres.h>
 }
-
-#include <vector>
-#include "darp.h"
 
 #define MAX_GENERATIONS 100 //must be over 15000
 #define MAX_RIDE_TIME 7200 //2 hours
@@ -34,49 +33,58 @@ extern "C"
 #undef DEBUG
 //#define DEBUG 1
 
+#ifndef _MSC_VER
 #ifdef DEBUG
 #define DBG(format, arg...)                     \
     elog(NOTICE, format , ## arg)
 #else
 #define DBG(format, arg...) do { ; } while (0)
 #endif
+#else // _MSC_VER
+#ifdef DEBUG
+#define DBG(format, ...) \
+  pgr_dbg(format, ##__VA_ARGS__)
+#else
+#define DBG(format, ...) do { ; } while (0)
+#endif
+#endif // _MSC_VER
 
-using namespace std;
+//using namespace std;
 
 int onum, vnum;
 int depot;
 int *pen;
 
-vector<order_t> ORDERS;
-vector<vehicle_t> VEHICLES;
-vector< vector<double> > DISTANCES;
+std::vector<order_t> ORDERS;
+std::vector<vehicle_t> VEHICLES;
+std::vector< std::vector<double> > DISTANCES;
 
-vector< vector< pair<int, double> > > ORD;
+std::vector< std::vector< std::pair<int, double> > > ORD;
 
 
 class Router
 {
 	public:
-	vector<order_t> v;    //orders in clusters
-	vector<int>     cs;   //customers served
-	vector<int>     cv;     //customers in a vehicle
-	vector<int>     cn;   //customers not yet served
+	std::vector<order_t> v;    //orders in clusters
+	std::vector<int>     cs;   //customers served
+	std::vector<int>     cv;     //customers in a vehicle
+	std::vector<int>     cn;   //customers not yet served
 	
 	int n;            //total number of customers in all clusters
 	int cun;          //number of customers in a cluster
-	vector<float> w;       //weights
+	std::vector<float> w;       //weights
 	//w[1], w[2] - total route and time windows violation weight
 	//w[3], w[4] - ride time and route duration violation
 	//w[5], w[6] - weight of ex riding and waiting time
 	//w[7]       - weight on distance
 	
-	vector<double> load;   //vector with a load in a vehicle after
+	std::vector<double> load;   //vector with a load in a vehicle after
 	                       //a node has been served
 	              
-	vector<double> ctime;
-	vector<double> wtime;
+	std::vector<double> ctime;
+	std::vector<double> wtime;
 	
-	vector<int> ord;      //order of customers in a solution 
+	std::vector<int> ord;      //order of customers in a solution 
 	
 	//Request r;
 	//Distance d;
@@ -1004,7 +1012,7 @@ boolean darp_score(population *pop, entity *entity)
  	//route(pop, entity);
 	int c;
 	
-	ORD = vector<vector< pair<int, double> > > ( pop->num_chromosomes, vector< pair<int, double> > ( 0 ) );
+	ORD = std::vector<std::vector< std::pair<int, double> > > ( pop->num_chromosomes, std::vector< std::pair<int, double> > ( 0 ) );
 	
     // for each vehicle (cluster)
 	for (c = 0; c < pop->num_chromosomes; c++)
@@ -1037,7 +1045,7 @@ boolean darp_score(population *pop, entity *entity)
 		for(int i=0;i < router.ord.size(); ++i)
 		{			
 			DBG("router.ord[%i]=%i",i, router.ord.at(i));
-			ORD.at(c).push_back(pair<int,double>( router.ord.at(i), ( i == 0 ? 
+			ORD.at(c).push_back(std::pair<int,double>( router.ord.at(i), ( i == 0 ? 
 																		(router.ctime.at(1) - router.ctime.at(0)) - DISTANCES.at(0).at(router.ord.at(1))
 																		//router.ctime.at(0) 
 																		: router.ctime.at(i) - router.ctime.at(i-1) 
@@ -1058,7 +1066,7 @@ find_darp_solution(int order_num, int vehicle_num,
 			vehicle_t *vehicles,
 			order_t *orders,
 			itinerary_t *path,
-			double *dist,
+			double **dist,
 			//point_t depot,
 			int depot_id,
 			int *penalties,
@@ -1093,13 +1101,13 @@ find_darp_solution(int order_num, int vehicle_num,
   
   for(int d = 0; d < order_num*2 - 1; ++d)
   {
-	  vector<double> row;
+	  std::vector<double> row;
 	  //ugly
 	  for(int dd = 0; dd < (order_num*2-1); ++dd)
 	  {
-	    *(dist + (order_num * d) + dd);
+	    *(*dist + (order_num * d) + dd);
 	    //DBG("dist[%i][%i]=%f",d,dd,*(dist + ((order_num * 2 - 1) * d) + dd));
-	    row.push_back(*(dist + ((order_num * 2 - 1) * d) + dd));
+	    row.push_back(*(*dist + ((order_num * 2 - 1) * d) + dd));
 	  }
 	  
 	  DISTANCES.push_back(row);
@@ -1179,7 +1187,7 @@ find_darp_solution(int order_num, int vehicle_num,
         
         //DBG("ORD size is %i x %i", ORD.size(), ORD.at(0).size());
         
-        vector<itinerary_t> res;
+        std::vector<itinerary_t> res;
         
         for(int i = 0; i < ORD.size(); ++i)
         {

@@ -18,13 +18,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  */
- 
+
+#ifndef _DARP_H
 #define _DARP_H
 #define MAX_ORDERS 200
 #define MAX_VEHICLES 100
 
 #include "postgres.h"
-#include "dijkstra.h"
 #include "utils/date.h" //for TimeTzADT
 #include "utils/nabstime.h" //for TimeInterval
 
@@ -80,10 +80,14 @@ extern "C"
 			// arrays only.
 			// Depot is also included.
 			// Ugly but simple solution.
-			double *dist,
+			double **dist,
 			int depot,
 			int *penalties,
 			float* fit, char** err_msg);
+#ifdef _MSC_VER
+  void pgr_dbg(const char* format, ...);
+#endif // _MSC_VER
 #ifdef __cplusplus
 }
 #endif
+#endif // _DARP_H

@@ -35,7 +35,7 @@
 PG_MODULE_MAGIC;
 #endif
 
-#undef qsort
+//#undef qsort
 
 // ------------------------------------------------------------------------
 
@@ -70,18 +70,39 @@ long profipts1, profipts2, profopts;
 #endif // PROFILE
 
 // ------------------------------------------------------------------------
-
+#ifndef _MSC_VER
 Datum darp(PG_FUNCTION_ARGS);
+#else // _MSC_VER
+PGDLLEXPORT Datum darp(PG_FUNCTION_ARGS);
+#endif // _MSC_VER
 
 //#undef DEBUG
 #define DEBUG 1
 
+#ifndef _MSC_VER
 #ifdef DEBUG
 #define DBG(format, arg...)                     \
     elog(NOTICE, format , ## arg)
 #else
 #define DBG(format, arg...) do { ; } while (0)
 #endif
+#else // _MSC_VER
+extern void pgr_dbg(const char *format, ...)
+{
+  va_list ap;
+  char msg[256];
+  va_start(ap, format);
+  _vsprintf_p(msg, 256, format, ap);
+  va_end(ap);
+  elog(NOTICE, msg);
+}
+#ifdef DEBUG
+#define DBG(format, ...) \
+  pgr_dbg(format, ##__VA_ARGS__)
+#else
+#define DBG(format, ...) do { ; } while (0)
+#endif
+#endif // _MSC_VER
 
 // The number of tuples to fetch from the SPI cursor at each iteration
 #define TUPLIMIT 10000
@@ -304,7 +325,7 @@ fetch_distance_columns(SPITupleTable *tuptable, distance_columns_t *distance_col
 
 static void
 fetch_distance(HeapTuple *tuple, TupleDesc *tupdesc, 
-            distance_columns_t *distance_columns, double *dist, int num_rows, order_t *orders)
+            distance_columns_t *distance_columns, double **dist, int num_rows, order_t *orders)
 {
   Datum binval;
   bool isnull;
@@ -312,6 +333,8 @@ fetch_distance(HeapTuple *tuple, TupleDesc *tupdesc,
   int from_order, to_order;
   int from_point, to_point;
   float value;
+  int from, to;
+  order_t ford, tord;
   
   //DBG("Inside distance fetched\n");
 
@@ -360,22 +383,22 @@ fetch_distance(HeapTuple *tuple, TupleDesc *tupdesc,
   
   //DBG("dist[%i][%i] = %f\n", from_point, to_point, value);
     
-  int from = find_order(from_order, orders, order_num);
+  from = find_order(from_order, orders, order_num);
   
   //DBG("found ford %i for %i", from, from_order);
   
-  order_t ford = orders[from];
+  ford = orders[from];
   
   if(from_point == ford.to)
   {
 	  from += order_num;
   }
   
-  int to = find_order(to_order, orders, order_num);
+  to = find_order(to_order, orders, order_num);
   
   //DBG("found tord %i for %i", to, to_order);
   
-  order_t tord = orders[to];
+  tord = orders[to];
 
   if(to_point == tord.to)
   {
@@ -384,7 +407,7 @@ fetch_distance(HeapTuple *tuple, TupleDesc *tupdesc,
     
   //dist[from][to] = value;
   if(from > 0 && to > 0)
-	*(dist + (num_rows * from) + to) = value;
+	*(*dist + (num_rows * from) + to) = value;
   
   //DBG("dist[%i(%i:%i)][%i(%i:%i)] = %f\n", from, from_order, from_point, to, to_order, to_point, *(dist + (num_rows * from) + to));
 
@@ -650,16 +673,32 @@ static int solve_darp(char* orders_sql, char* vehicles_sql,
   int ntuples;
 
   vehicle_t *vehicles=NULL;
+#ifndef _MSC_VER
   vehicle_columns_t vehicle_columns = {id: -1, capacity: -1};
+#else // _MSC_VER
+  vehicle_columns_t vehicle_columns = {-1, 0, -1};
+#endif // _MSC_VER
 
   order_t *orders=NULL;
+#ifndef _MSC_VER
   order_columns_t order_columns = {
 		  order_id: -1, puLT: -1, doLT:-1,  puUT: -1, doUT:-1, size:-1, from:-1, to:-1};
-		  
+#else // _MSC_VER
+  order_columns_t order_columns = {-1, 0, -1, -1, 0, -1, -1, -1, -1, -1};
+#endif // _MSC_VER
+
+#ifndef _MSC_VER
   distance_columns_t distance_columns = {from_order: -1, from_point: -1, to_order: -1, to_point: -1, value: -1};
+#else // _MSC_VER
+  distance_columns_t distance_columns = {-1, -1, -1, -1, -1};
+#endif // _MSC_VER
   
   int penalties[9];
+#ifndef _MSC_VER
   penalty_columns_t penalty_columns = {w1: -1, w2: -1, w3: -1, w4: -1, w5: -1, w6: -1, w7: -1, w8: -1};
+#else // _MSC_VER
+  penalty_columns_t penalty_columns = {-1, -1, -1, -1, -1, -1, -1, -1};
+#endif // _MSC_VER
   
   char *err_msg = NULL;
   int ret = -1;
@@ -672,6 +711,10 @@ static int solve_darp(char* orders_sql, char* vehicles_sql,
   
   int prep = -1, con = -1;
 
+  order_t depot_ord;
+  double *dist = NULL;
+  int o;
+
   DBG("inside darp\n");
 
   //int total_tuples = 0;
@@ -681,7 +724,12 @@ static int solve_darp(char* orders_sql, char* vehicles_sql,
 
   DBG("start darp\n");
   
-  order_t depot_ord = {id:0, order_id:depot, from:depot_point, to:depot_point};
+  //order_t depot_ord = {id:0, order_id:depot, from:depot_point, to:depot_point};
+  depot_ord.id = 0;
+  depot_ord.order_id = depot;
+  depot_ord.from = depot_point;
+  depot_ord.to = depot_point;
+
   orders = palloc(1 * sizeof(order_t));
   orders[0] = depot_ord;
   
@@ -830,7 +878,8 @@ static int solve_darp(char* orders_sql, char* vehicles_sql,
     }// end of fetching vehicles
     //finish(&SPIcode_v);
     
-  double dist[order_num*2+1][order_num*2+1];
+  //double dist[order_num*2+1][order_num*2+1];
+  dist = (double*)palloc((order_num*2+1) * (order_num*2+1) * sizeof(double));
 
   // Fetching distances
   
@@ -838,7 +887,10 @@ static int solve_darp(char* orders_sql, char* vehicles_sql,
   prep = prepare_query(&SPIportal_d, dist_sql);
 
   if (prep < 0)
+  {
+    pfree(dist);
 	  return ret;
+  }
 	  
   DBG("Query: %s\n",dist_sql);
   DBG("Query executed\n");
@@ -850,7 +902,10 @@ static int solve_darp(char* orders_sql, char* vehicles_sql,
       if (distance_columns.value == -1)
         {
           if (fetch_distance_columns(SPI_tuptable, &distance_columns) == -1)
+          {
+            pfree(dist);
         	  return finish(&SPIcode);
+          }
         }
 
       ntuples = SPI_processed;
@@ -868,7 +923,7 @@ static int solve_darp(char* orders_sql, char* vehicles_sql,
               HeapTuple tuple = tuptable->vals[t];
               //DBG("Before distance fetched\n");
               fetch_distance(&tuple, &tupdesc, &distance_columns,
-                          &dist[0][0], order_num *2-1, &orders[0]);
+                          &dist, order_num *2-1, &orders[0]);
             }
 
           SPI_freetuptable(tuptable);
@@ -886,7 +941,10 @@ static int solve_darp(char* orders_sql, char* vehicles_sql,
   prep = prepare_query(&SPIportal_p, penalties_sql);
 
   if (prep < 0)
+  {
+    pfree(dist);
 	  return ret;
+  }
 	  
   DBG("Query: %s\n",penalties_sql);
   DBG("Query executed\n");
@@ -899,7 +957,10 @@ static int solve_darp(char* orders_sql, char* vehicles_sql,
       if (penalty_columns.w1 == -1)
         {
           if (fetch_penalties_columns(SPI_tuptable, &penalty_columns) == -1)
+          {
+            pfree(dist);
         	  return finish(&SPIcode);
+          }
         }
         
 
@@ -946,7 +1007,6 @@ static int solve_darp(char* orders_sql, char* vehicles_sql,
   qsort (orders, order_num+1, sizeof (order_t), order_cmp_asc);
 
 
-  int o;
   for(o=0; o<order_num+1;++o)
   {
 	  DBG("ORDERS[%i] = {id=%i,order_id=%i,from=%i,to=%i}",o,orders[o].id,orders[o].order_id,orders[o].from,orders[o].to);
@@ -962,7 +1022,7 @@ static int solve_darp(char* orders_sql, char* vehicles_sql,
 			    vehicles,
 			    orders,
 			    path,
-			    &dist[0][0], //2D array containing pre-calculated distances
+			    &dist, //2D array containing pre-calculated distances
 			    depot,
 			    penalties,
 			    &fit, &err_msg);
@@ -986,11 +1046,16 @@ static int solve_darp(char* orders_sql, char* vehicles_sql,
     
   //pfree(vehicles);
   //pfree(orders);
+  pfree(dist);
   finish(&SPIcode);    
 }
 
 PG_FUNCTION_INFO_V1(darp);
+#ifndef _MSC_VER
 Datum
+#else // _MSC_VER
+PGDLLEXPORT Datum
+#endif // _MSC_VER
 darp(PG_FUNCTION_ARGS)
 {
   FuncCallContext     *funcctx;
