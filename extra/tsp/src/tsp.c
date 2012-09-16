@@ -86,17 +86,21 @@ PGDLLEXPORT Datum tsp(PG_FUNCTION_ARGS);
 #define DBG(format, arg...) do { ; } while (0)
 #endif
 #else // _MSC_VER
-extern void DBG(const char *format, ...)
+extern void pgr_dbg(const char *format, ...)
 {
-#if DEBUG
   va_list ap;
   char msg[256];
   va_start(ap, format);
   _vsprintf_p(msg, 256, format, ap);
   va_end(ap);
   elog(NOTICE, msg);
-#endif
 }
+#ifdef DEBUG
+#define DBG(format, ...) \
+  pgr_dbg(format, ##__VA_ARGS__)
+#else
+#define DBG(format, ...) do { ; } while (0)
+#endif
 #endif // _MSC_VER
 
 // The number of tuples to fetch from the SPI cursor at each iteration

@@ -76,6 +76,22 @@ PGDLLEXPORT Datum driving_distance(PG_FUNCTION_ARGS);
 #else
 #define DBG(format, arg...) do { ; } while (0)
 #endif
+#else // _MSC_VER
+extern void pgr_dbg(const char *format, ...)
+{
+  va_list ap;
+  char msg[256];
+  va_start(ap, format);
+  _vsprintf_p(msg, 256, format, ap);
+  va_end(ap);
+  elog(NOTICE, msg);
+}
+#ifdef DEBUG
+#define DBG(format, ...) \
+  pgr_dbg(format, ##__VA_ARGS__)
+#else
+#define DBG(format, ...) do { ; } while (0)
+#endif
 #endif // _MSC_VER
 
 // The number of tuples to fetch from the SPI cursor at each iteration

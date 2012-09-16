@@ -42,9 +42,7 @@ extern "C"
 
   int alpha_shape(vertex_t *vertices, unsigned int count, 
                   vertex_t **res, int *res_count, char **err_msg);
-#ifdef _MSC_VER
-  void DBG(const char* format, ...);
-#endif // _MSC_VER
+
 #ifdef __cplusplus
 }
 #endif

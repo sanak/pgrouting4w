@@ -37,6 +37,9 @@ extern "C"
                           int source_vertex_id, double rdistance,
                           bool directed, bool has_reverse_cost,
                           path_element_t **path, int *path_count, char **err_msg);
+#ifdef _MSC_VER
+  void pgr_dbg(const char* format, ...);
+#endif // _MSC_VER
 #ifdef __cplusplus
 }
 #endif
