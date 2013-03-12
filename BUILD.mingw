@@ -39,9 +39,9 @@ MinGW/MSYS
 
 CMake
 -------------------------------------------------------------
- Use latest version(2.8.8) (win32 binary package)
+ Use latest version(2.8.10) (win32 binary package)
  
- http://www.cmake.org/files/v2.8/cmake-2.8.8-win32-x86.exe
+ http://www.cmake.org/files/v2.8/cmake-2.8.10-win32-x86.exe
  
  Run the installer, and select 'Add CMake to the system PATH for xxx'.
 
@@ -54,17 +54,23 @@ Boost
  $ wget http://sourceforge.net/projects/boost/files/boost/1.46.1/boost_1_46_1.zip
  $ unzip boost_1_46_1.zip
  $ cd boost_1_46_1
+ 
+ Add "C:\MinGW\bin" to the system PATH.
+ 
  $ start cmd
  
  Execute from Command Prompt:
  
- >bootstrap.bat mingw
+ >bootstrap.bat gcc
  >exit
  
  Then execute from MinGW Shell:
  
  $ bjam toolset=gcc address-model=32 define=BOOST_USE_WINDOWS_H link=static threading=multi --with-thread --prefix=/usr/local install
 
+ * Above bjam build instruction is quoted from the following site.
+   [Unable to build Boost libraries with GCC - Stack Overflow]
+   http://stackoverflow.com/questions/5299468/unable-to-build-boost-libraries-with-gcc
 
 CGAL
 -------------------------------------------------------------
@@ -103,22 +109,22 @@ Gaul
 
 PostgreSQL
 -------------------------------------------------------------
- Use latest version(9.1.4)
+ Use latest version(9.2.3)
  
- http://www.enterprisedb.com/postgresql-914-installers-win32?ls=Crossover&type=Crossover
+ http://www.enterprisedb.com/postgresql-923-installers-win32?ls=Crossover&type=Crossover
  
  Run the installer, and install PostGIS(1.x/2.x) from Stack Builder.
  
  Next, build source for header include:
  
  $ cd /c/build
- $ wget http://ftp.postgresql.org/pub/source/v9.1.4/postgresql-9.1.4.tar.bz2
- $ tar xvfj postgresql-9.1.4.tar.bz2
- $ cd postgresql-9.1.4
- $ ./configure --prefix=/usr/local/postgresql-9.1.4
+ $ wget http://ftp.postgresql.org/pub/source/v9.2.3/postgresql-9.2.3.tar.bz2
+ $ tar xvfj postgresql-9.2.3.tar.bz2
+ $ cd postgresql-9.2.3
+ $ ./configure --prefix=/usr/local/postgresql-9.2.3
  $ make
  $ make install
- $ cd /usr/local/postgresql-9.1.4/lib
+ $ cd /usr/local/postgresql-9.2.3/lib
  $ mv libpq.a libpq.a.mingw
 
  Then export library file for link EnterpriseDB.
@@ -127,7 +133,7 @@ PostgreSQL
  $ cd /c/PROGRA~2/PostgreSQL/9.1/lib
  $ pexports libpq.dll > libpq.def
  $ dlltool -U -d libpq.def -l libpq.a
- $ cp libpq.a /usr/local/postgresql-9.1.4/lib/
+ $ cp libpq.a /usr/local/postgresql-9.2.3/lib/
 
 
 pgRouting
