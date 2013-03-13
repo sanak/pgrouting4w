@@ -53,10 +53,7 @@ Boost
  $ cd /c/build
  $ wget http://sourceforge.net/projects/boost/files/boost/1.46.1/boost_1_46_1.zip
  $ unzip boost_1_46_1.zip
- $ cd boost_1_46_1
- 
- Add "C:\MinGW\bin" to the system PATH.
- 
+ $ cd boost_1_46_1/tools/build/v2
  $ start cmd
  
  Execute from Command Prompt:
@@ -66,6 +63,8 @@ Boost
  
  Then execute from MinGW Shell:
  
+ $ cp bjam.exe /c/build/boost_1_46_1/
+ $ cd /c/build/boost_1_46_1
  $ bjam toolset=gcc address-model=32 define=BOOST_USE_WINDOWS_H link=static threading=multi --with-thread --prefix=/usr/local install
 
  * Above bjam build instruction is quoted from the following site.
