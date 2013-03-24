@@ -29,7 +29,7 @@ else(CGAL_INCLUDE_DIR AND CGAL_LIBRARIES AND BOOST_THREAD_LIBRARIES AND GMP_LIBR
      $ENV{SystemDrive}/CGAL/*/lib
      )
 
-  find_library(BOOST_THREAD_LIBRARIES NAMES boost_thread libboost_thread
+  find_library(BOOST_THREAD_LIBRARIES NAMES boost_thread boost_thread-mt libboost_thread boost_thread-mt
      PATHS
      /usr/lib
      /usr/local/lib
