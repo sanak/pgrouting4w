@@ -1,5 +1,5 @@
 create or replace function pgr_trsp(sql text, vids integer[], directed boolean, has_reverse_cost boolean, turn_restrict_sql text DEFAULT NULL::text)
-    RETURNS SETOF pgr_costresult AS
+    RETURNS SETOF pgr_costresult3 AS
 $body$
 /*
  *  pgr_trsp(sql text, vids integer[], directed boolean, has_reverse_cost boolean, turn_restrict_sql text DEFAULT NULL::text)
@@ -12,32 +12,23 @@ $body$
 declare
     i integer;
     rr record;
-    lrr record;
-    lrra boolean := false;
     seq integer := 0;
+    res pgr_costresult3;
 
 begin
     -- loop through each pair of vids and compute the path
     for i in 1 .. array_length(vids, 1)-1 loop
         for rr in select * from pgr_trsp(sql, vids[i], vids[i+1], directed, has_reverse_cost, turn_restrict_sql) loop
-            -- filter out the individual path ends except the last one
-            -- we might not want to do this so we can know where the via points are in the path result
-            -- but this needs more thought
-            --raise notice 'rr: %', rr;
-            if rr.id2 = -1 then
-                lrr := rr;
-                lrra := true;
-            else
-                seq := seq + 1;
-                rr.seq := seq;
-                return next rr;
-            end if;
+            res.seq := seq;
+            res.id1 := i - 1;
+            res.id2 := rr.id1;
+            res.id3 := rr.id2;
+            res.cost := rr.cost;
+            seq := seq + 1;
+            return next res;
         end loop;
     end loop;
 
-    if lrra then
-        return next lrr;
-    end if;
     return;
 end;
 $body$
@@ -51,7 +42,7 @@ $body$
 ----------------------------------------------------------------------------------------------------------
 
 create or replace function pgr_trsp(sql text, eids integer[], pcts float8[], directed boolean, has_reverse_cost boolean, turn_restrict_sql text DEFAULT NULL::text)
-    RETURNS SETOF pgr_costresult AS
+    RETURNS SETOF pgr_costresult3 AS
 $body$
 /*
  *  pgr_trsp(sql text, eids integer[], pcts float8[], directed boolean, has_reverse_cost boolean, turn_restrict_sql text DEFAULT NULL::text)
@@ -65,9 +56,8 @@ $body$
 declare
     i integer;
     rr record;
-    lrr record;
-    first boolean := true;
     seq integer := 0;
+    res pgr_costresult3;
 
 begin
     if array_length(eids, 1) != array_length(pcts, 1) then
@@ -77,27 +67,16 @@ begin
     -- loop through each pair of vids and compute the path
     for i in 1 .. array_length(eids, 1)-1 loop
         for rr in select * from pgr_trsp(sql, eids[i], pcts[i], eids[i+1], pcts[i+1], directed, has_reverse_cost, turn_restrict_sql) loop
-            -- combine intermediate via costs when cost is split across
-            -- two parts of a segment because it stops it and
-            -- restarts the next leg also on it
-            -- we might not want to do this so we can know where the via points are in the path result
-            -- but this needs more thought
-            --raise notice 'rr: %', rr;
-            if first then
-                lrr := rr;
-                first := false;
-            else
-                if lrr.id2 = rr.id2 then
-                    lrr.cost := lrr.cost + rr.cost;
-                else
-                    return next lrr;
-                    lrr := rr;
-                end if;
-            end if;
+            res.seq := seq;
+            res.id1 := i - 1;
+            res.id2 := rr.id1;
+            res.id3 := rr.id2;
+            res.cost := rr.cost;
+            seq := seq + 1;
+            return next res;
         end loop;
     end loop;
-
-    return next lrr;
+    
     return;
 end;
 $body$

@@ -30,7 +30,7 @@ Name
 Synopsis
 -------------------------------------------------------------------------------
 
-The turn restricted shorthest path (TRSP) is a shortest path algorithm that can optionally take into account complicated turn restrictions like those found in real work navigable road networks. Performamnce wise it is nearly as fast as the A* search but has many additional features like it works with edges rather than the nodes of the network. Returns a set of :ref:`pgr_costResult <type_cost_result>` (seq, id1, id2, cost) rows, that make up a path.
+The turn restricted shorthest path (TRSP) is a shortest path algorithm that can optionally take into account complicated turn restrictions like those found in real work navigable road networks. Performamnce wise it is nearly as fast as the A* search but has many additional features like it works with edges rather than the nodes of the network. Returns a set of :ref:`pgr_costResult <type_cost_result>` (seq, id1, id2, cost) rows or a set of :ref:`pgr_costResult3 <type_cost_result3>` (seq, id1, id2, id3, cost) rows, that make up a path.
 
 .. code-block:: sql
 
@@ -46,13 +46,13 @@ The turn restricted shorthest path (TRSP) is a shortest path algorithm that can 
 
 .. code-block:: sql
 
-    pgr_costResult[] pgr_trsp(sql text, vids integer[],
+    pgr_costResult3[] pgr_trsp(sql text, vids integer[],
                     directed boolean, has_reverse_cost boolean
                     [, turn_restrict_sql text]);
 
 .. code-block:: sql
 
-     pgr_costResult[] pgr_trsp(sql text, eids integer[], pcts float8[],
+     pgr_costResult3[] pgr_trsp(sql text, eids integer[], pcts float8[],
                     directed boolean, has_reverse_cost boolean
                     [, turn_restrict_sql text]);
 
@@ -149,12 +149,13 @@ Another variant of TRSP allows to specify **EDGE id** together with a fraction t
 :eids: ``int4`` An ordered array of **EDGE id** that the path has to traverse
 :pcts: ``float8`` An array of fractional positions along the respective edges in ``eids``, where 0.0 is the start of the edge and 1.0 is the end of the eadge.
 
-Returns set of :ref:`type_cost_result`:
+Returns set of :ref:`pgr_costResult3[] <type_cost_result3>`:
 
 :seq:   row sequence
-:id1:   node ID
-:id2:   edge ID (``-1`` for the last row)
-:cost:  cost to traverse from ``id1`` using ``id2``
+:id1:   path ID
+:id2:   node ID
+:id3:   edge ID (``-1`` for the last row)
+:cost:  cost to traverse from ``id2`` using ``id3``
 
 
 .. rubric:: History
@@ -230,65 +231,69 @@ An example query using vertex ids and via points:
 
 .. code-block:: sql
 
-    select * from pgr_trsp(
-        'select eid as id, source::integer, target::integer,cost,
-            reverse_cost from edges1',
+    SELECT * FROM pgr_trsp(
+        'SELECT eid AS id, source::integer, target::integer, cost,
+            reverse_cost FROM edges1',
         ARRAY[1,8,13,5]::integer[],     -- array of vids
         true,  -- directed graph?
         true,  -- has_reverse_cost?
         -- include the turn restrictions
-        'select to_cost, teid as target_id, feid || 
-            coalesce('',''||via,'''') as via_path from restrictions1');
+        'SELECT to_cost, teid AS target_id, feid || 
+            coalesce('',''||via,'''') AS via_path FROM restrictions1');
 
-     seq | id1 | id2 | cost
-    -----+-----+-----+------
-       1 |   1 |   1 |    1
-       2 |   2 |   4 |    1
-       3 |   7 |   8 |    1
-       4 |   8 |   8 |    1
-       5 |   7 |  10 |    1
-       6 |  10 |  14 |    1
-       7 |  13 |  14 |    1
-       8 |  10 |  10 |    1
-       9 |   7 |   7 |    1
-      10 |   6 |   6 |    1
-       4 |   5 |  -1 |    0
-    (11 rows)
+     seq | id1 | id2 | id3 | cost 
+    -----+-----+-----+-----+------
+       0 |   0 |   1 |   1 |    1
+       1 |   0 |   2 |   4 |    1
+       2 |   0 |   7 |   8 |    1
+       3 |   0 |   8 |  -1 |    0
+       4 |   1 |   8 |   8 |    1
+       5 |   1 |   7 |  10 |    1
+       6 |   1 |  10 |  14 |    1
+       7 |   1 |  13 |  -1 |    0
+       8 |   2 |  13 |  14 |    1
+       9 |   2 |  10 |  10 |    1
+      10 |   2 |   7 |   7 |    1
+      11 |   2 |   6 |   6 |    1
+      12 |   2 |   5 |  -1 |    0
+    (13 rows)
 
 An example query using edge ids and vias:
 
 .. code-block:: sql
 
-    select * from pgr_trsp(
-        'select eid as id, source::integer, target::integer,cost,
-             reverse_cost from edges1',
+    SELECT * FROM pgr_trsp(
+        'SELECT eid AS id, source::integer, target::integer, cost,
+             reverse_cost FROM edges1',
         ARRAY[1,11,6]::integer[],           -- array of eids
         ARRAY[0.5, 0.5, 0.5]::float8[],     -- array of pcts
         true,  -- directed graph?
         true,  -- has_reverse_cost?
         -- include the turn restrictions
-        'select to_cost, teid as target_id, feid ||
-            coalesce('',''||via,'''') as via_path from restrictions1');
+        'SELECT to_cost, teid AS target_id, feid ||
+            coalesce('',''||via,'''') AS via_path FROM restrictions1');
 
-     seq | id1 | id2 | cost
-    -----+-----+-----+------
-       0 |  -1 |   1 |  0.5
-       1 |   2 |   4 |    1
-       2 |   7 |   8 |    1
-       3 |   8 |  11 |    1
-       1 |  11 |  13 |    1
-       2 |  12 |  15 |    1
-       3 |   9 |   9 |    1
-       4 |   8 |   8 |    1
-       5 |   7 |   7 |    1
-       6 |   6 |   6 |  0.5
-    (10 rows)
+     seq | id1 | id2 | id3 | cost 
+    -----+-----+-----+-----+------
+       0 |   0 |  -1 |   1 |  0.5
+       1 |   0 |   2 |   4 |    1
+       2 |   0 |   7 |   8 |    1
+       3 |   0 |   8 |  11 |  0.5
+       4 |   1 |  -1 |  11 |  0.5
+       5 |   1 |  11 |  13 |    1
+       6 |   1 |  12 |  15 |    1
+       7 |   1 |   9 |   9 |    1
+       8 |   1 |   8 |   8 |    1
+       9 |   1 |   7 |   7 |    1
+      10 |   1 |   6 |   6 |  0.5
+    (11 rows)
 
 
-The queries use the :ref:`sampledata` network.
+The queries use the :ref:`sampledata` or ``src/trsp/test/trsp-any-00.data`` network.
 
 
 See Also
 -------------------------------------------------------------------------------
 
 * :ref:`type_cost_result`
+* :ref:`type_cost_result3`
