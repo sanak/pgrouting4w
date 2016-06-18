@@ -28,9 +28,7 @@ init:
   - git config --global core.autocrlf false
 
 install:
-  - cd c:\
-  - mkdir build
-  - cd build
+  - cd c:\build
   - curl -O http://download.osgeo.org/postgis/windows/pg94/archive/postgis-bundle-pg94x64-2.2.0.zip
   - 7z x postgis-bundle-pg94x64-2.2.0.zip
   - cd postgis-bundle-pg94x64-2.2.0
