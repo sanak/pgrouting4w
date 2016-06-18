@@ -40,13 +40,13 @@ install:
   - copy share\extension\*.control C:\Progra~1\PostgreSQL\9.4\share\extension\
   - copy share\extension\*.sql C:\Progra~1\PostgreSQL\9.4\share\extension\
   - cd ..
-  - curl -O https://github.com/CGAL/cgal/archive/releases/CGAL-4.6.1.zip
+  - curl -O http://github.com/CGAL/cgal/archive/releases/CGAL-4.6.1.zip
   - 7z x CGAL-4.6.1.zip
   - mkdir gmp
   - cd gmp
-  - curl -O https://cgal.geometryfactory.com/CGAL/precompiled_libs/auxiliary/x64/GMP/5.0.1/gmp-all-CGAL-3.9.zip
+  - curl -O http://cgal.geometryfactory.com/CGAL/precompiled_libs/auxiliary/x64/GMP/5.0.1/gmp-all-CGAL-3.9.zip
   - 7z x gmp-all-CGAL-3.9.zip
-  - curl -O https://cgal.geometryfactory.com/CGAL/precompiled_libs/auxiliary/x64/MPFR/3.0.0/mpfr-all-CGAL-3.9.zip
+  - curl -O http://cgal.geometryfactory.com/CGAL/precompiled_libs/auxiliary/x64/MPFR/3.0.0/mpfr-all-CGAL-3.9.zip
   - 7z x mpfr-all-CGAL-3.9.zip
 
 build_script:
