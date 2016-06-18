@@ -34,7 +34,7 @@ install:
   - xcopy /e /y /q postgis-bundle-pg94x64-2.2.0 C:\Progra~1\PostgreSQL\9.4
   - curl -L -O -S -s http://downloads.sourceforge.net/project/boost/boost/1.58.0/boost_1_58_0.zip
   - 7z x boost_1_58_0.zip
-  - curl -L -O -v http://github.com/CGAL/cgal/releases/download/releases%2FCGAL-4.8.1/CGAL-4.8.1.zip
+  - curl -L -O -S -s http://github.com/CGAL/cgal/releases/download/releases/CGAL-4.8.1/CGAL-4.8.1.zip
   - 7z x CGAL-4.8.1.zip
   - mkdir gmp\x64
   - cd gmp\x64
