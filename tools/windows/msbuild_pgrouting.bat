@@ -4,7 +4,6 @@ rem doskey cmake="%PROGRAMFILES% (x86)\CMake\bin\cmake.exe"
 echo APPVEYOR=%APPVEYOR%
 
 set BUILD_ROOT_DIR=c:\build
-set LIBINTL_HEADER_DIR=C:\cygwin\usr\include
 set BOOST_VER=1_58_0
 set CGAL_VER=4.6.1
 set GMP_LIB_NAME=libgmp-10.lib
@@ -200,7 +199,7 @@ if not exist %PGROUTING_BUILD_DIR%\ (
 	mkdir %PGROUTING_BUILD_DIR%
 	pushd %PGROUTING_BUILD_DIR%
 	@echo on
-	cmake -G "%CMAKE_GENERATOR%" -DPOSTGRESQL_INCLUDE_DIR:PATH="%POSTGRESQL_DIR%\include\server;%POSTGRESQL_DIR%\include\server\port;%POSTGRESQL_DIR%\include\server\port\win32;%POSTGRESQL_DIR%\include\server\port\win32_msvc;%LIBINTL_HEADER_DIR%" ^
+	cmake -G "%CMAKE_GENERATOR%" -DPOSTGRESQL_INCLUDE_DIR:PATH="%POSTGRESQL_DIR%\include;%POSTGRESQL_DIR%\include\server;%POSTGRESQL_DIR%\include\server\port;%POSTGRESQL_DIR%\include\server\port\win32;%POSTGRESQL_DIR%\include\server\port\win32_msvc" ^
 		-DPOSTGRESQL_LIBRARIES:FILEPATH="%POSTGRESQL_DIR%\lib\postgres.lib" -DPOSTGRESQL_EXECUTABLE:FILEPATH="%POSTGRESQL_DIR%\bin\postgres.exe" ^
 		-DPOSTGRESQL_PG_CONFIG:FILEPATH="%POSTGRESQL_DIR%\bin\pg_config.exe" -DBoost_INCLUDE_DIR:PATH=%BOOST_INCLUDE_DIR% ^
 		-DBOOST_THREAD_LIBRARIES:FILEPATH="%BOOST_THREAD_LIB%;%BOOST_SYSTEM_LIB%" ^
