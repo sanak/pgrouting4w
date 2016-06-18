@@ -1,6 +1,7 @@
 @echo off
 
 rem doskey cmake="%PROGRAMFILES% (x86)\CMake\bin\cmake.exe"
+echo "APPVEYOR=%APPVEYOR%"
 
 set BUILD_ROOT_DIR=c:\build
 set LIBINTL_HEADER_DIR=C:\cygwin\usr\include
