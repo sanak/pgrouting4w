@@ -1,7 +1,7 @@
 @echo off
 
 rem doskey cmake="%PROGRAMFILES% (x86)\CMake\bin\cmake.exe"
-echo "APPVEYOR=%APPVEYOR%"
+echo APPVEYOR=%APPVEYOR%
 
 set BUILD_ROOT_DIR=c:\build
 set LIBINTL_HEADER_DIR=C:\cygwin\usr\include
@@ -16,11 +16,7 @@ if "%APPVEYOR%"=="True" (
 )
 
 set COMMON_INSTALL_ROOT_DIR=%BUILD_ROOT_DIR%\local
-if "%APPVEYOR%"=="True" (
-	set BOOST_SRC_DIR=C:\Libraries\boost_%BOOST_VER%
-) else (
-	set BOOST_SRC_DIR=%BUILD_ROOT_DIR%\boost_%BOOST_VER%
-)
+set BOOST_SRC_DIR=%BUILD_ROOT_DIR%\boost_%BOOST_VER%
 set GMP_ROOT_DIR=%BUILD_ROOT_DIR%\gmp
 set CGAL_SRC_DIR=%BUILD_ROOT_DIR%\CGAL-%CGAL_VER%
 
@@ -149,21 +145,13 @@ echo POSTGRESQL_DIR="%POSTGRESQL_DIR%"
 
 rem ### Boost ###
 set BOOST_SHORT_VER=%BOOST_VER:_0=%
-if "%APPVEYOR%"=="True" (
-	set BOOST_INCLUDE_DIR=%BOOST_SRC_DIR%
-	set BOOST_LIBRARY_DIR=%BOOST_SRC_DIR%\stage\lib
-	set BOOST_THREAD_LIB=%BOOST_SRC_DIR%\stage\lib\libboost_thread-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
-	set BOOST_SYSTEM_LIB=%BOOST_SRC_DIR%\stage\lib\libboost_system-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
-	set BOOST_WILDCARD_LIB=%BOOST_SRC_DIR%\stage\lib\libboost_*-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.libs
-) else (
-	set BOOST_INCLUDE_DIR=%COMMON_INSTALL_DIR%\include\boost-%BOOST_SHORT_VER%
-	set BOOST_LIBRARY_DIR=%COMMON_INSTALL_DIR%\lib
-	set BOOST_THREAD_LIB=%COMMON_INSTALL_DIR%\lib\libboost_thread-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
-	set BOOST_SYSTEM_LIB=%COMMON_INSTALL_DIR%\lib\libboost_system-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
-	set BOOST_WILDCARD_LIB=%COMMON_INSTALL_DIR%\lib\libboost_*-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.libs
-)
+set BOOST_INCLUDE_DIR=%COMMON_INSTALL_DIR%\include\boost-%BOOST_SHORT_VER%
+set BOOST_LIBRARY_DIR=%COMMON_INSTALL_DIR%\lib
+set BOOST_THREAD_LIB=%COMMON_INSTALL_DIR%\lib\libboost_thread-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
+set BOOST_SYSTEM_LIB=%COMMON_INSTALL_DIR%\lib\libboost_system-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
+set BOOST_WILDCARD_LIB=%COMMON_INSTALL_DIR%\lib\libboost_*-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.libs
 
-if not exist "%BOOST_SRC_DIR%\b2.exe" if not "%APPVEYOR"=="True" (
+if not exist "%BOOST_SRC_DIR%\b2.exe" (
 	pushd %BOOST_SRC_DIR%
 	call "bootstrap.bat"
 	popd
