@@ -34,7 +34,7 @@ install:
   - cd postgis-bundle-pg94x64-2.2.0
   - copy bin\*.dll C:\Progra~1\PostgreSQL\9.4\bin\
   - copy bin\*.exe C:\Progra~1\PostgreSQL\9.4\bin\
-  - copy gdaldata C:\Progra~1\PostgreSQL\9.4\
+  - copy gdal-data C:\Progra~1\PostgreSQL\9.4\
   - copy lib\*.dll C:\Progra~1\PostgreSQL\9.4\lib\
   - copy share\contrib\postgis-2.2 C:\Progra~1\PostgreSQL\9.4\share\contrib\
   - copy share\extension\*.control C:\Progra~1\PostgreSQL\9.4\share\extension\
