@@ -151,17 +151,19 @@ rem ### Boost ###
 set BOOST_SHORT_VER=%BOOST_VER:_0=%
 if "%APPVEYOR%"=="True" (
 	set BOOST_INCLUDE_DIR=%BOOST_SRC_DIR%
+	set BOOST_LIBRARY_DIR=%BOOST_SRC_DIR%\stage\lib
 	set BOOST_THREAD_LIB=%BOOST_SRC_DIR%\stage\lib\libboost_thread-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
 	set BOOST_SYSTEM_LIB=%BOOST_SRC_DIR%\stage\lib\libboost_system-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
 	set BOOST_WILDCARD_LIB=%BOOST_SRC_DIR%\stage\lib\libboost_*-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.libs
 ) else (
 	set BOOST_INCLUDE_DIR=%COMMON_INSTALL_DIR%\include\boost-%BOOST_SHORT_VER%
+	set BOOST_LIBRARY_DIR=%COMMON_INSTALL_DIR%\lib
 	set BOOST_THREAD_LIB=%COMMON_INSTALL_DIR%\lib\libboost_thread-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
 	set BOOST_SYSTEM_LIB=%COMMON_INSTALL_DIR%\lib\libboost_system-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
 	set BOOST_WILDCARD_LIB=%COMMON_INSTALL_DIR%\lib\libboost_*-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.libs
 )
 
-if not exist "%BOOST_SRC_DIR%\b2.exe" (
+if not exist "%BOOST_SRC_DIR%\b2.exe" if not "%APPVEYOR"=="True" (
 	pushd %BOOST_SRC_DIR%
 	call "bootstrap.bat"
 	popd
@@ -191,8 +193,8 @@ if not exist %CGAL_BUILD_DIR%\ (
 	@echo on
 	cmake -G "%CMAKE_GENERATOR%" -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=%COMMON_INSTALL_DIR% ^
 		-DBoost_USE_MULTITHREADED=ON -DCGAL_Boost_USE_STATIC_LIBS=ON -DBoost_USE_STATIC_RUNTIME=OFF ^
-		-DBoost_INCLUDE_DIR:PATH=%COMMON_INSTALL_DIR%\include\boost-%BOOST_SHORT_VER% ^
-		-DBOOST_LIBRARYDIR=%COMMON_INSTALL_DIR%\lib -DGMP_INCLUDE_DIR=%GMP_DIR%\include ^
+		-DBoost_INCLUDE_DIR:PATH=%BOOST_INCLUDE_DIR% ^
+		-DBOOST_LIBRARYDIR=%BOOST_LIBRARY_DIR% -DGMP_INCLUDE_DIR=%GMP_DIR%\include ^
 		-DGMP_LIBRARIES=%GMP_DIR%\lib\%GMP_LIB_NAME% -DMPFR_INCLUDE_DIR=%GMP_DIR%\include ^
 		-DMPFR_LIBRARIES=%GMP_DIR%\lib\%MPFR_LIB_NAME% -DWITH_CGAL_QT3=OFF -DWITH_CGAL_QT4=OFF ..\..\..\
 	msbuild CGAL.sln /target:Build /property:Configuration=%MSBUILD_CONFIGURATION%
