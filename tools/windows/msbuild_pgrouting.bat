@@ -5,7 +5,7 @@ echo APPVEYOR=%APPVEYOR%
 
 set BUILD_ROOT_DIR=c:\build
 set BOOST_VER=1_58_0
-set CGAL_VER=4.6.1
+set CGAL_VER=4.8.1
 set GMP_LIB_NAME=libgmp-10.lib
 set MPFR_LIB_NAME=libmpfr-4.lib
 if "%APPVEYOR%"=="True" (
