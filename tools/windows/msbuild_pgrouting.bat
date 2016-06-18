@@ -8,10 +8,18 @@ set BOOST_VER=1_58_0
 set CGAL_VER=4.6.1
 set GMP_LIB_NAME=libgmp-10.lib
 set MPFR_LIB_NAME=libmpfr-4.lib
-set MSBUILD_CONFIGURATION=RelWithDebInfo
+if "%APPVEYOR%"=="True" (
+	set MSBUILD_CONFIGURATION=%CONFIGURATION%
+) else (
+	set MSBUILD_CONFIGURATION=RelWithDebInfo
+)
 
 set COMMON_INSTALL_ROOT_DIR=%BUILD_ROOT_DIR%\local
-set BOOST_SRC_DIR=%BUILD_ROOT_DIR%\boost_%BOOST_VER%
+if "%APPVEYOR%"=="True" (
+	set BOOST_SRC_DIR=C:\Libraries\boost_%BOOST_VER%
+) else (
+	set BOOST_SRC_DIR=%BUILD_ROOT_DIR%\boost_%BOOST_VER%
+)
 set GMP_ROOT_DIR=%BUILD_ROOT_DIR%\gmp
 set CGAL_SRC_DIR=%BUILD_ROOT_DIR%\CGAL-%CGAL_VER%
 
@@ -140,10 +148,17 @@ echo POSTGRESQL_DIR="%POSTGRESQL_DIR%"
 
 rem ### Boost ###
 set BOOST_SHORT_VER=%BOOST_VER:_0=%
-set BOOST_INCLUDE_DIR=%COMMON_INSTALL_DIR%\include\boost-%BOOST_SHORT_VER%
-set BOOST_THREAD_LIB=%COMMON_INSTALL_DIR%\lib\libboost_thread-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
-set BOOST_SYSTEM_LIB=%COMMON_INSTALL_DIR%\lib\libboost_system-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
-set BOOST_WILDCARD_LIB=%COMMON_INSTALL_DIR%\lib\libboost_*-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.libs
+if "%APPVEYOR%"=="True" (
+	set BOOST_INCLUDE_DIR=%BOOST_SRC_DIR%
+	set BOOST_THREAD_LIB=%BOOST_SRC_DIR%\stage\lib\libboost_thread-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
+	set BOOST_SYSTEM_LIB=%BOOST_SRC_DIR%\stage\lib\libboost_system-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
+	set BOOST_WILDCARD_LIB=%BOOST_SRC_DIR%\stage\lib\libboost_*-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.libs
+) else (
+	set BOOST_INCLUDE_DIR=%COMMON_INSTALL_DIR%\include\boost-%BOOST_SHORT_VER%
+	set BOOST_THREAD_LIB=%COMMON_INSTALL_DIR%\lib\libboost_thread-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
+	set BOOST_SYSTEM_LIB=%COMMON_INSTALL_DIR%\lib\libboost_system-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.lib
+	set BOOST_WILDCARD_LIB=%COMMON_INSTALL_DIR%\lib\libboost_*-vc%MSVC_VER:.=%-mt-%BOOST_SHORT_VER%.libs
+)
 
 if not exist "%BOOST_SRC_DIR%\b2.exe" (
 	pushd %BOOST_SRC_DIR%
