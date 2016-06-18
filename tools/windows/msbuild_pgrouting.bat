@@ -165,7 +165,7 @@ if not exist %BOOST_INCLUDE_DIR%\ (
 	pushd %BOOST_SRC_DIR%
 	@echo on
 	b2 toolset=%BOOST_TOOLSET% variant=release link=static threading=multi address-model=%BOOST_ADDRESS_MODEL% ^
-		--with-thread --with-system --prefix=%COMMON_INSTALL_DIR% install
+		--with-thread --with-system --prefix=%COMMON_INSTALL_DIR% -d0 install
 	@echo off
 	popd
 )
