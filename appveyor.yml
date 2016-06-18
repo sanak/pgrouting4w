@@ -29,23 +29,18 @@ init:
 
 install:
   - cd c:\build
-  - curl -O http://download.osgeo.org/postgis/windows/pg94/archive/postgis-bundle-pg94x64-2.2.0.zip
+  - curl -L http://download.osgeo.org/postgis/windows/pg94/archive/postgis-bundle-pg94x64-2.2.0.zip > postgis-bundle-pg94x64-2.2.0.zip
   - 7z x postgis-bundle-pg94x64-2.2.0.zip
   - xcopy /e /y postgis-bundle-pg94x64-2.2.0 C:\Progra~1\PostgreSQL\9.4
-  - git clone -q --depth=1 --branch=boost-1.58.0 https://github.com/boostorg/boost.git boost_1_58_0
-  #- curl -O http://github.com/CGAL/cgal/archive/releases/CGAL-4.6.1.zip
-  #- 7z x CGAL-4.6.1.zip
-  - git clone -q --depth=1 --branch=releases/CGAL-4.6.1 https://github.com/CGAL/cgal.git CGAL-4.6.1
-  #- mkdir gmp\x64
-  #- cd gmp\x64
-  #- curl -O http://cgal.geometryfactory.com/CGAL/precompiled_libs/auxiliary/x64/GMP/5.0.1/gmp-all-CGAL-3.9.zip
-  #- 7z x gmp-all-CGAL-3.9.zip
-  #- curl -O http://cgal.geometryfactory.com/CGAL/precompiled_libs/auxiliary/x64/MPFR/3.0.0/mpfr-all-CGAL-3.9.zip
-  #- 7z x mpfr-all-CGAL-3.9.zip
-  - mkdir gmp
-  - xcopy /e c:\build\pgrouting\tools\windows\msvc\gmp gmp
+  - curl -L http://downloads.sourceforge.net/project/boost/boost/1.58.0/boost_1_58_0.zip > boost_1_58_0.zip
+  - 7z x boost_1_58_0.zip
+  - curl -L http://github.com/CGAL/cgal/archive/releases/CGAL-4.6.1.zip > CGAL-4.6.1.zip
+  - 7z x CGAL-4.6.1.zip
+  - mkdir gmp\x64
   - cd gmp\x64
+  - curl -L http://cgal.geometryfactory.com/CGAL/precompiled_libs/auxiliary/x64/GMP/5.0.1/gmp-all-CGAL-3.9.zip > gmp-all-CGAL-3.9.zip
   - 7z x gmp-all-CGAL-3.9.zip
+  - curl -L http://cgal.geometryfactory.com/CGAL/precompiled_libs/auxiliary/x64/MPFR/3.0.0/mpfr-all-CGAL-3.9.zip > mpfr-all-CGAL-3.9.zip
   - 7z x mpfr-all-CGAL-3.9.zip
 
 build_script:
