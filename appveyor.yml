@@ -59,4 +59,4 @@ test_script:
   #- export PATH=$PATH:$PGHOME/bin
   #- cd /cygdrive/c/build/pgrouting
   #- tools/testers/algorithm-tester.pl -psql "/cygdrive/c/Progra~1/PostgreSQL/9.4/bin/psql" -ignorenotice
-  - C:\cygwin\bin\bash -lc "export PG USER=postgres && export PGPASSWORD=Password12! && export PGHOME=\"/cygdrive/c/Progra~1/PostgreSQL/9.4\" && export PGPORT=5432 && export PATH=$PATH:$PGHOME/bin && cd /cygdrive/c/build/pgrouting && tools/testers/algorithm-tester.pl -psql "/cygdrive/c/Progra~1/PostgreSQL/9.4/bin/psql" -ignorenotice"
+  - C:\cygwin\bin\bash -lc "export PGUSER=postgres && export PGPASSWORD=Password12! && export PGHOME=\"/cygdrive/c/Progra~1/PostgreSQL/9.4\" && export PGPORT=5432 && export PATH=$PATH:$PGHOME/bin && cd /cygdrive/c/build/pgrouting && tools/testers/algorithm-tester.pl -psql \"/cygdrive/c/Progra~1/PostgreSQL/9.4/bin/psql\" -ignorenotice"
