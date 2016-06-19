@@ -45,6 +45,9 @@ build_script:
   - curl -L -O -S -s http://download.osgeo.org/postgis/windows/pg94/archive/postgis-bundle-pg94x64-2.2.0.zip
   - 7z x postgis-bundle-pg94x64-2.2.0.zip
   - xcopy /e /y /q postgis-bundle-pg94x64-2.2.0 C:\Progra~1\PostgreSQL\9.4
+  - curl -L -O -S -s http://winnie.postgis.net/download/windows/pg95/buildbot/libcurl7.48withsslx64.zip
+  - 7z x libcurl7.48withsslx64.zip
+  - copy libcurl7.48withsslx64\libcurl-4 C:\Progra~1\PostgreSQL\9.4\bin\
   - if exist "C:/Program Files/PostgreSQL/9.4/lib/rtpostgis-2.2.dll" (echo PostGIS is installed) else (echo PostGIS is not installed)
   #- cd c:\build\pgrouting\tools\windows
   #- msbuild_pgrouting.bat 9.4 x64
