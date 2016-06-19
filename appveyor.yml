@@ -59,7 +59,7 @@ test_script:
   - set PGPASSWORD=Password12!
   - set PGHOME="C:\Progra~1\PostgreSQL\9.4"
   - set PGPORT=5432
-  - set PATH=$PATH:$PGHOME/bin
+  - set PATH=%PATH%;%PGHOME%\bin
   ##- cd /cygdrive/c/build/pgrouting
   ##- tools/testers/algorithm-tester.pl -psql "/cygdrive/c/Progra~1/PostgreSQL/9.4/bin/psql" -ignorenotice
   #- C:\cygwin\bin\bash -lc "cd /cygdrive/c/build/pgrouting && tools/testers/algorithm-tester.pl -psql \"/cygdrive/c/Progra~1/PostgreSQL/9.4/bin/psql\" -ignorenotice"
