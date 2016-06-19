@@ -9,7 +9,7 @@ version: 1.0.{build}
 
 branches:
   only:
-    - test/appveyor
+    - test/appveyor2
 
 image: Visual Studio 2013
 configuration: Release
@@ -42,6 +42,13 @@ install:
   - 7z x gmp-all-CGAL-3.9.zip
   - curl -L -O -S -s http://cgal.geometryfactory.com/CGAL/precompiled_libs/auxiliary/x64/MPFR/3.0.0/mpfr-all-CGAL-3.9.zip
   - 7z x mpfr-all-CGAL-3.9.zip
+  # CMake 3.5.2 workaround
+  - cd c:\build
+  - echo Installing CMake 3.5.2 ...
+  - curl -L -O -S -s https://cmake.org/files/v3.5/cmake-3.5.2-win32-x86.msi
+  - start /wait msiexec /i cmake-3.5.2-win32-x86.msi /qn
+  - cmake --version
+  - echo CMake 3.5.2 installed
 
 build_script:
   - cd c:\build\pgrouting\tools\windows
