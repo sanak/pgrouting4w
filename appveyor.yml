@@ -29,9 +29,6 @@ init:
 
 install:
   - cd c:\build
-  - curl -L -O -S -s http://download.osgeo.org/postgis/windows/pg94/archive/postgis-bundle-pg94x64-2.2.0.zip
-  - 7z x postgis-bundle-pg94x64-2.2.0.zip
-  - xcopy /e /y /q postgis-bundle-pg94x64-2.2.0 C:\Progra~1\PostgreSQL\9.4
   - curl -L -O -S -s http://downloads.sourceforge.net/project/boost/boost/1.58.0/boost_1_58_0.zip
   - 7z x boost_1_58_0.zip
   - curl -L -O -S -s http://github.com/CGAL/cgal/releases/download/releases/CGAL-4.8.1/CGAL-4.8.1.zip
@@ -44,6 +41,10 @@ install:
   - 7z x mpfr-all-CGAL-3.9.zip
 
 build_script:
+  - cd c:\build
+  - curl -L -O -S -s http://download.osgeo.org/postgis/windows/pg94/archive/postgis-bundle-pg94x64-2.2.0.zip
+  - 7z x postgis-bundle-pg94x64-2.2.0.zip
+  - xcopy /e /y /q postgis-bundle-pg94x64-2.2.0 C:\Progra~1\PostgreSQL\9.4
   - cd c:\build\pgrouting\tools\windows
   - msbuild_pgrouting.bat 9.4 x64
   - cd c:\build\pgrouting\build\pg94\x64
